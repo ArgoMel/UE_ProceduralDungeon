@@ -82,6 +82,23 @@ namespace EDungeonGameIAs
 		}
 	}
 	template<class T, class FuncType>
+	void BindInput_StartCompleteCancel(UEnhancedInputComponent* Input, const UInputAction* Action, T* Obj,
+		FuncType StartFunc, FuncType CompleteFunc, FuncType CancelFunc)
+	{
+		if (StartFunc)
+		{
+			Input->BindAction(Action, ETriggerEvent::Started, Obj, StartFunc);
+		}
+		if (CompleteFunc)
+		{
+			Input->BindAction(Action, ETriggerEvent::Completed, Obj, CompleteFunc);
+		}
+		if (CancelFunc)
+		{
+			Input->BindAction(Action, ETriggerEvent::Canceled, Obj, CancelFunc);
+		}
+	}
+	template<class T, class FuncType>
 	void BindInput_StartTriggerCompleteCancel(UEnhancedInputComponent* Input, const UInputAction* Action, T* Obj,
 		FuncType StartFunc, FuncType TriggerFunc, FuncType CompleteFunc, FuncType CancelFunc)
 	{

@@ -1,21 +1,37 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "../ProceduralDungeon.h"
+#include "ProceduralDungeon.h"
 #include "GameFramework/PlayerController.h"
+#include "Interface/INT_PlayerController.h"
 #include "PC_DungeonGame.generated.h"
 
 class UDungeonGameIAs;
 
 UCLASS()
 class PROCEDURALDUNGEON_API APC_DungeonGame : public APlayerController
+	, public IINT_PlayerController
 {
 	GENERATED_BODY()
 public:
 	APC_DungeonGame();
 protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void OnPossess(APawn* aPawn) override;
+
+	void SetPlayerCanMove_Implementation(bool CanMove);
+
+protected:
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	TObjectPtr<APawn> mPlayerPawn;
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	bool bCanMove;
+
+protected:
+	UFUNCTION()
+	virtual void MoveTriggered(const FInputActionValue& Value);
 
 #pragma region EnhancedInput
 protected:

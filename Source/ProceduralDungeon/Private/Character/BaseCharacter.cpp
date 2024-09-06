@@ -1,11 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/BaseCharacter.h"
+#include "Components/CapsuleComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	bIsDead = false;
+}
+
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, bIsDead);
+}
+
+void ABaseCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	UpdateCollisionCapsuleToFitMesh();
 }
 
 void ABaseCharacter::BeginPlay()
@@ -21,5 +36,60 @@ void ABaseCharacter::Tick(float DeltaTime)
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void ABaseCharacter::UpdateCollisionCapsuleToFitMesh()
+{
+	USkeletalMeshComponent* mesh = GetMesh();
+	if (!IsValid(mesh))
+	{
+		UE_LOG(LogTemp, Error, TEXT(
+			"Attempted to update collision capsule on pawn %s, but mesh wasn't valid."),*GetNameSafe(this));
+		return;
+	}
+	USkeletalMesh* meshAsset = mesh->GetSkeletalMeshAsset();
+	if (!IsValid(meshAsset))
+	{
+		UE_LOG(LogTemp, Error, TEXT(
+			"Attempted to update collision capsule on pawn %s, but meshAsset wasn't valid."),*GetNameSafe(this));
+		return;
+	}
+	const FBoxSphereBounds meshBounds = meshAsset->GetBounds();
+	const FVector scale3D = mesh->GetRelativeScale3D();
+
+	// set collision cylinder appropriately to mesh size
+	const float newRadius = ((meshBounds.BoxExtent.X + meshBounds.BoxExtent.Y) / 2.0f)
+		* 0.5f * FMath::Max(scale3D.X, scale3D.Y);
+	// conversion factor based on known good capsule height from UE3 prototype.
+	const float boxHeightConversionFactor = 1.324f;
+	const float newHalfHeight = meshBounds.BoxExtent.Z * 0.5f * boxHeightConversionFactor * scale3D.Z;
+
+	// set the currently in-use cylinders
+	GetCapsuleComponent()->SetCapsuleSize(newRadius, meshBounds.BoxExtent.Z - 2.f);
+	GetCapsuleComponent()->SetRelativeScale3D(FVector(1.));
+
+	UpdateRelativeLocationToFitCapsule();
+}
+
+void ABaseCharacter::UpdateRelativeLocationToFitCapsule() const
+{	
+	// Update the Mesh's relative location, taking into account foot-origin vs. center-origin characters.
+	FVector newRelativeLocation{ GetMesh()->GetRelativeLocation() };
+	newRelativeLocation.Z = -(GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 2.f);
+	GetMesh()->SetRelativeLocation(newRelativeLocation);
+}
+
+void ABaseCharacter::OnRep_IsDead()
+{
+}
+
+void ABaseCharacter::Multi_PlayMontage_Implementation(UAnimMontage* MontageToPlay)
+{
+	PlayAnimMontage(MontageToPlay);
+}
+
+void ABaseCharacter::Multi_PlaySFX_Implementation(USoundBase* Sound, FVector Loc)
+{
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Loc);
 }
 

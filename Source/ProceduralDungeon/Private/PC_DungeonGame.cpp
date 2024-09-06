@@ -3,10 +3,20 @@
 #include "PC_DungeonGame.h"
 #include "Input/DungeonGameIAs.h"
 #include "EnhancedInputSubsystems.h"
+#include <Kismet/KismetMathLibrary.h>
 
 APC_DungeonGame::APC_DungeonGame()
 {
+	bCanMove = true;
+
 	GetObjectAsset(mDungeonGameIAs, UDungeonGameIAs,"/Game/_Main/Inputs/DA_DungoenGameIAs.DA_DungoenGameIAs");
+}
+
+void APC_DungeonGame::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, mPlayerPawn);
+	DOREPLIFETIME(ThisClass, bCanMove);
 }
 
 void APC_DungeonGame::BeginPlay()
@@ -30,6 +40,29 @@ void APC_DungeonGame::SetupInputComponent()
 	{
 		return;
 	}
+	EDungeonGameIAs::BindInput_TriggerOnly(input, mDungeonGameIAs->mMove, this, &ThisClass::MoveTriggered);
+}
+
+void APC_DungeonGame::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	mPlayerPawn = aPawn;
+}
+
+void APC_DungeonGame::SetPlayerCanMove_Implementation(bool CanMove)
+{
+	bCanMove = CanMove;
+}
+
+void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)
+{
+	if (!IsValid(mPlayerPawn)||!bCanMove)
+	{
+		return;
+	}
+	FVector2D value = Value.Get<FVector2D>();
+	mPlayerPawn->AddMovementInput(UKismetMathLibrary::GetForwardVector(mPlayerPawn->GetControlRotation()), value.Y);
+	mPlayerPawn->AddMovementInput(UKismetMathLibrary::GetRightVector(mPlayerPawn->GetControlRotation()), value.X);
 }
 
 void APC_DungeonGame::AddInputMapping(const UInputMappingContext* InputMapping, const int32 MappingPriority) const

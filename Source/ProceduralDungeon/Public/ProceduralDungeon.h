@@ -2,6 +2,7 @@
 
 #pragma once
 #include "CoreMinimal.h"
+#include "Net/UnrealNetwork.h"
 #include "InputActionValue.h"
 
 #pragma region LoadAsset
@@ -17,7 +18,7 @@ if (__##RETURN_POINTER.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed GetObjectAsset : %d"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed GetObjectAsset : %s"),TEXT(PATH));\
 	RETURN_POINTER = nullptr;\
 }
 
@@ -29,7 +30,7 @@ if (RETURN_POINTER##NAME.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed AddObjectAsset : %d"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed AddObjectAsset : %s"),TEXT(PATH));\
 }
 /*    Class Asset을 받습니다.
 *    RETURN_POINTER : 받을 포인터
@@ -43,7 +44,7 @@ if (__##RETURN_POINTER.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed GetClassAsset : %d"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed GetClassAsset : %s"),TEXT(PATH));\
 	RETURN_POINTER = nullptr;\
 }
 #pragma endregion
