@@ -11,8 +11,6 @@ ABasePlayer::ABasePlayer()
 {
 	bUseControllerRotationYaw = false;
 
-	bCurrentlyAttacking = false;
-
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	mSpringArm->SetupAttachment(RootComponent);
 	mSpringArm->SetRelativeRotation(FRotator(-60.f,0.f,0.f));
@@ -44,12 +42,16 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (!IsValid(input) || !IsValid(mPlayerController))
+	if (!mPlayerController)
+	{
+		mPlayerController = Cast<APC_DungeonGame>(Controller);
+	}
+	if (!input || !mPlayerController)
 	{
 		return;
 	}
 	const UDungeonGameIAs* dungeonGameIAs = mPlayerController->GetDungeonGameIAs();
-	if (!IsValid(dungeonGameIAs))
+	if (!dungeonGameIAs)
 	{
 		return;
 	}

@@ -2,6 +2,7 @@
 
 #pragma once
 #include "Character/BasePlayer.h"
+#include <Components/TimelineComponent.h>
 #include "Player_Swordsman.generated.h"
 
 UCLASS()
@@ -10,19 +11,46 @@ class PROCEDURALDUNGEON_API APlayer_Swordsman : public ABasePlayer
 	GENERATED_BODY()
 public:
 	APlayer_Swordsman();
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 public:
 	void UseAction1_Implementation();
 	void UseAction2_Implementation();
 	void UseAction3_Implementation();
 	void UseAction4_Implementation();
 
+private:
+	FTimeline mBlinkTL;
+
 protected:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
 	TArray<UAnimMontage*> mAction1Montages;
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	FVector mStartBlinkLoc;
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	FVector mEndBlinkLoc;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Timeline")
+	TObjectPtr<UCurveFloat> mLerpCurve;
+
+protected:
+	UFUNCTION(Category = "Timeline")
+	void UpdateBlinkLerpCurve(float Value);
+	UFUNCTION(Category = "Timeline")
+	void CompleteBlink();
 
 public:
 	virtual void Server_Action1_Implementation() override;
 	virtual void Server_Action2_Implementation() override;
 	virtual void Server_Action3_Implementation() override;
 	virtual void Server_Action4_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
+	void Client_Blink();
+	virtual void Client_Blink_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void Blink();
 };

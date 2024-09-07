@@ -5,6 +5,9 @@
 #include "Net/UnrealNetwork.h"
 #include "InputActionValue.h"
 
+#define PROFILENAME_RAGDOLL TEXT("ragdoll")
+#define PROFILENAME_PAWN TEXT("Pawn")
+
 #pragma region LoadAsset
 /*    Object Asset을 받습니다.
 *    RETURN_POINTER : 받을 포인터
