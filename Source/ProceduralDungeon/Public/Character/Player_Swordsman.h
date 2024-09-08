@@ -20,6 +20,7 @@ public:
 	void UseAction2_Implementation();
 	void UseAction3_Implementation();
 	void UseAction4_Implementation();
+	APlayer_Swordsman* GetPlayerSwordsmanRef_Implementation();
 
 private:
 	FTimeline mBlinkTL;
@@ -31,6 +32,8 @@ protected:
 	FVector mStartBlinkLoc;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	FVector mEndBlinkLoc;
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	bool bIsBlinking;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Timeline")
 	TObjectPtr<UCurveFloat> mLerpCurve;

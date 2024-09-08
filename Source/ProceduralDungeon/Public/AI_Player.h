@@ -5,6 +5,8 @@
 #include "Animation/AnimInstance.h"
 #include "AI_Player.generated.h"
 
+class APlayer_Swordsman;
+
 UCLASS()
 class PROCEDURALDUNGEON_API UAI_Player : public UAnimInstance
 {

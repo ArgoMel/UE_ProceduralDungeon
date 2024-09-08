@@ -17,6 +17,7 @@ APlayer_Swordsman::APlayer_Swordsman()
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_B_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_C_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_C_Fast_Montage.Swordsman_Attack_C_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_D_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_D_Fast_Montage.Swordsman_Attack_D_Fast_Montage");
+	bIsBlinking = false;
 
 	GetObjectAsset(mLerpCurve, UCurveFloat,"/Game/_Main/Player/Swordsman/C_Blink.C_Blink");
 
@@ -48,6 +49,7 @@ void APlayer_Swordsman::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, mStartBlinkLoc);
 	DOREPLIFETIME(ThisClass, mEndBlinkLoc);
+	DOREPLIFETIME(ThisClass, bIsBlinking);
 }
 
 void APlayer_Swordsman::BeginPlay()
@@ -102,6 +104,11 @@ void APlayer_Swordsman::UseAction4_Implementation()
 {
 }
 
+APlayer_Swordsman* APlayer_Swordsman::GetPlayerSwordsmanRef_Implementation()
+{
+	return this;
+}
+
 void APlayer_Swordsman::Server_Action1_Implementation()
 {
 	Super::Server_Action1_Implementation();
@@ -150,6 +157,7 @@ void APlayer_Swordsman::Client_Blink_Implementation()
 
 void APlayer_Swordsman::Blink()
 {
+	bIsBlinking = true;
 	GetCapsuleComponent()->SetCollisionProfileName(PROFILENAME_RAGDOLL);
 	FHitResult result;
 	mStartBlinkLoc=GetActorLocation();
@@ -171,4 +179,13 @@ void APlayer_Swordsman::UpdateBlinkLerpCurve(float Value)
 void APlayer_Swordsman::CompleteBlink()
 {
 	GetCapsuleComponent()->SetCollisionProfileName(PROFILENAME_PAWN);
+	bIsBlinking = false;
+	if (HasAuthority())
+	{
+		bCurrentlyAttacking = false;
+		if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+		{
+			IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, true);
+		}
+	}
 }

@@ -5,6 +5,8 @@
 #include "UObject/Interface.h"
 #include "INT_PlayerCharacter.generated.h"
 
+class APlayer_Swordsman;
+
 UINTERFACE(MinimalAPI)
 class UINT_PlayerCharacter : public UInterface
 {
@@ -25,4 +27,6 @@ public:
 	void UseAction3();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void UseAction4();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	APlayer_Swordsman* GetPlayerSwordsmanRef();
 };
