@@ -38,4 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, Category = "Multicast")
 	void Multi_PlaySFX(USoundBase* Sound,FVector Loc);
 	virtual void Multi_PlaySFX_Implementation(USoundBase* Sound, FVector Loc);
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable, Category = "Multicast")
+	void Multi_SpawnParticle(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation = FRotator::ZeroRotator, FVector Scale = FVector(1.f));
+	virtual void Multi_SpawnParticle_Implementation(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation = FRotator::ZeroRotator, FVector Scale = FVector(1.f));
 };

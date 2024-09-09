@@ -4,6 +4,9 @@
 #include "PC_DungeonGame.h"
 #include "Interface/INT_PlayerController.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
+#include "Particles/ParticleSystem.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -17,9 +20,25 @@ APlayer_Swordsman::APlayer_Swordsman()
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_B_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_C_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_C_Fast_Montage.Swordsman_Attack_C_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_D_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_D_Fast_Montage.Swordsman_Attack_D_Fast_Montage");
-	bIsBlinking = false;
+	GetObjectAsset(mAction4Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Ability_R_Montage.Swordsman_Ability_R_Montage");
 
-	GetObjectAsset(mLerpCurve, UCurveFloat,"/Game/_Main/Player/Swordsman/C_Blink.C_Blink");
+	GetObjectAsset(mAction4Particle, UParticleSystem, "/Game/_Main/Player/Swordsman/P_Swordsman_Greystone_Novaborn_LeapAOE_Constellations.P_Swordsman_Greystone_Novaborn_LeapAOE_Constellations");
+
+	GetObjectAsset(mLerpCurve, UCurveFloat, "/Game/_Main/Player/Swordsman/C_Blink.C_Blink");
+
+	bIsBlinking = false;
+	bIsBlocking = false;
+
+	mAction4ParticleLoc = CreateDefaultSubobject<UArrowComponent>(TEXT("Action4ParticleLoc"));
+	mAction4ParticleLoc->SetupAttachment(RootComponent);
+	mAction4ParticleLoc->SetRelativeLocation(FVector(40.f, -200.f, -80.f));
+
+	mBlinkBox = CreateDefaultSubobject<UBoxComponent>(TEXT("BlinkBox"));
+	mBlinkBox->SetupAttachment(RootComponent);
+	mBlinkBox->SetRelativeLocation(FVector(65.f, 0.f, 35.f));
+	mBlinkBox->SetRelativeScale3D(FVector(1.f, 1.75f, 5.f));
+	mBlinkBox->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	mBlinkBox->SetCollisionProfileName(PROFILENAME_BLINK);
 
 	GetMesh()->SetRelativeRotation(FRotator(0.f,-90.f,0.f));
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Greystone_Novaborn(TEXT(
@@ -50,11 +69,14 @@ void APlayer_Swordsman::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ThisClass, mStartBlinkLoc);
 	DOREPLIFETIME(ThisClass, mEndBlinkLoc);
 	DOREPLIFETIME(ThisClass, bIsBlinking);
+	DOREPLIFETIME(ThisClass, bIsBlocking);
 }
 
 void APlayer_Swordsman::BeginPlay()
 {
 	Super::BeginPlay();
+	mBlinkBox->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OnBlinkBoxBeginOverlap);
+
 	FOnTimelineFloat lerpTLF;
 	lerpTLF.BindDynamic(this, &ThisClass::UpdateBlinkLerpCurve);
 	if (IsValid(mLerpCurve))
@@ -75,6 +97,17 @@ void APlayer_Swordsman::Tick(float DeltaTime)
 	}
 }
 
+float APlayer_Swordsman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if(bIsBlocking&&
+		PlayerHitCheck(DamageCauser))
+	{
+		damage = 0.f;
+	}
+	return damage;
+}
+
 void APlayer_Swordsman::UseAction1_Implementation()
 {
 	if(HasAuthority())
@@ -92,16 +125,23 @@ void APlayer_Swordsman::UseAction1_Implementation()
 	}
 }
 
-void APlayer_Swordsman::UseAction2_Implementation()
-{
-}
-
-void APlayer_Swordsman::UseAction3_Implementation()
-{
-}
-
 void APlayer_Swordsman::UseAction4_Implementation()
 {
+	if (HasAuthority())
+	{
+		Multi_SpawnParticle(mAction4Particle, mAction4ParticleLoc->GetComponentLocation(), mAction4ParticleLoc->GetComponentRotation());
+
+		FVector spherePos = GetActorLocation();
+		float sphereRadius = 350.f;
+		TArray<TEnumAsByte<EObjectTypeQuery>> objectTypes = { UEngineTypes::ConvertToObjectType(ECC_WorldDynamic),UEngineTypes::ConvertToObjectType(ECC_Pawn) };
+		TArray<AActor*> ignoreActors = { this };
+		TArray<AActor*> results;
+		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), spherePos, sphereRadius, objectTypes, nullptr, ignoreActors, results);
+		for (auto& result : results)
+		{
+			UGameplayStatics::ApplyDamage(result, 15.f, nullptr, this, nullptr);
+		}
+	}
 }
 
 APlayer_Swordsman* APlayer_Swordsman::GetPlayerSwordsmanRef_Implementation()
@@ -136,6 +176,7 @@ void APlayer_Swordsman::Server_Action2_Implementation()
 	{
 		IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, false);
 	}
+	mBlinkBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Blink();
 	Client_Blink();
 }
@@ -143,11 +184,46 @@ void APlayer_Swordsman::Server_Action2_Implementation()
 void APlayer_Swordsman::Server_Action3_Implementation()
 {
 	Super::Server_Action3_Implementation();
+	if (bCurrentlyAttacking || bIsDead)
+	{
+		return;
+	}
+	bCurrentlyAttacking = true;
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, false);
+	}
+	bIsBlocking = true;
+}
+
+void APlayer_Swordsman::Server_Action3End_Implementation()
+{
+	Super::Server_Action3End_Implementation();
+	if (!bIsBlocking || bIsDead)
+	{
+		return;
+	}
+	bCurrentlyAttacking = false;
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, true);
+	}
+	bIsBlocking = false;
 }
 
 void APlayer_Swordsman::Server_Action4_Implementation()
 {
 	Super::Server_Action4_Implementation();
+	if (bCurrentlyAttacking || bIsDead)
+	{
+		return;
+	}
+	bCurrentlyAttacking = true;
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, false);
+	}
+	Multi_PlayMontage(mAction4Montage);
 }
 
 void APlayer_Swordsman::Client_Blink_Implementation()
@@ -170,6 +246,19 @@ void APlayer_Swordsman::Blink()
 	mBlinkTL.PlayFromStart();
 }
 
+void APlayer_Swordsman::OnBlinkBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor==this)
+	{
+		return;
+	}
+	if (HasAuthority())
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, 15.f, nullptr, this, nullptr);
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetFName().ToString());
+	}
+}
+
 void APlayer_Swordsman::UpdateBlinkLerpCurve(float Value)
 {
 	FVector loc=FMath::Lerp(mStartBlinkLoc, mEndBlinkLoc,Value);
@@ -187,5 +276,17 @@ void APlayer_Swordsman::CompleteBlink()
 		{
 			IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, true);
 		}
+		mBlinkBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+bool APlayer_Swordsman::PlayerHitCheck(AActor* DamageCauser) const
+{
+	FVector dir=(GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal();
+	dir.Z = 0.f;
+	dir.Normalize();
+	FVector forwardVec = GetActorForwardVector();
+	forwardVec.Z = 0.f;
+	forwardVec.Normalize();
+	return forwardVec.Dot(dir) <= -0.4;
 }

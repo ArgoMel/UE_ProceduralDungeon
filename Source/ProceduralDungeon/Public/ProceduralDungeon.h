@@ -7,6 +7,8 @@
 
 #define PROFILENAME_RAGDOLL TEXT("ragdoll")
 #define PROFILENAME_PAWN TEXT("Pawn")
+#define PROFILENAME_BLINK TEXT("Blink")
+#define PROFILENAME_NOCOLLISION TEXT("NoCollision")
 
 #pragma region LoadAsset
 /*    Object Asset을 받습니다.

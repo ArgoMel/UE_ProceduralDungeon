@@ -9,6 +9,8 @@ ABaseCharacter::ABaseCharacter()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bIsDead = false;
+
+	GetMesh()->SetCollisionProfileName(PROFILENAME_NOCOLLISION);
 }
 
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -91,5 +93,10 @@ void ABaseCharacter::Multi_PlayMontage_Implementation(UAnimMontage* MontageToPla
 void ABaseCharacter::Multi_PlaySFX_Implementation(USoundBase* Sound, FVector Loc)
 {
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Loc);
+}
+
+void ABaseCharacter::Multi_SpawnParticle_Implementation(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation, FVector Scale)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Location, Rotation, Scale);
 }
 
