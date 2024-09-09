@@ -10,6 +10,8 @@
 #define PROFILENAME_BLINK TEXT("Blink")
 #define PROFILENAME_NOCOLLISION TEXT("NoCollision")
 
+#define TAG_ENEMY TEXT("Enemy")
+
 #pragma region LoadAsset
 /*    Object Asset을 받습니다.
 *    RETURN_POINTER : 받을 포인터
