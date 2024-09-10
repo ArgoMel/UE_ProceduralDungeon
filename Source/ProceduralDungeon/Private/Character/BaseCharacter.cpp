@@ -9,6 +9,8 @@ ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	mMaxHealth = 0;
+	mCurHealth = mCurHealth;
 	bIsDead = false;
 
 	GetMesh()->SetCollisionProfileName(PROFILENAME_NOCOLLISION);
@@ -17,6 +19,9 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, mInitialSpawnLoc);
+	DOREPLIFETIME(ThisClass, mCurHealth);
+	DOREPLIFETIME(ThisClass, mMaxHealth);
 	DOREPLIFETIME(ThisClass, bIsDead);
 }
 
@@ -29,6 +34,7 @@ void ABaseCharacter::OnConstruction(const FTransform& Transform)
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	mInitialSpawnLoc=GetActorLocation();
 }
 
 void ABaseCharacter::Tick(float DeltaTime)

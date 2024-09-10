@@ -23,6 +23,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 public:
 	void SetIsAttacking_Implementation(bool Attacking);
+	ABasePlayer* GetPlayerRef_Implementation();
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Component")

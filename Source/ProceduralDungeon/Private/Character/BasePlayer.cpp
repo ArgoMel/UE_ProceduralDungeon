@@ -10,6 +10,7 @@
 ABasePlayer::ABasePlayer()
 {
 	bUseControllerRotationYaw = false;
+	Tags.Add(TAG_PLAYER);
 
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	mSpringArm->SetupAttachment(RootComponent);
@@ -71,6 +72,11 @@ void ABasePlayer::SetIsAttacking_Implementation(bool Attacking)
 			IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, true);
 		}
 	}
+}
+
+ABasePlayer* ABasePlayer::GetPlayerRef_Implementation()
+{
+	return this;
 }
 
 void ABasePlayer::Server_Action1_Implementation()

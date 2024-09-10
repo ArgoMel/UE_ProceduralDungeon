@@ -8,9 +8,27 @@
 #define PROFILENAME_RAGDOLL TEXT("ragdoll")
 #define PROFILENAME_PAWN TEXT("Pawn")
 #define PROFILENAME_BLINK TEXT("Blink")
+#define PROFILENAME_ENEMYATTACK TEXT("EnemyAttack")
 #define PROFILENAME_NOCOLLISION TEXT("NoCollision")
 
+#define TAG_PLAYER TEXT("Player")
 #define TAG_ENEMY TEXT("Enemy")
+
+#pragma region ValidMecro
+#define VALIDCHECK(POINTER)\
+if (!IsValid(POINTER))\
+{\
+	UE_LOG(LogTemp, Warning, TEXT("%s 유효하지 않음"), *POINTER->GetFName().ToString());\
+	return;\
+}
+
+#define VALIDCHECK_RETURNVALUE(POINTER,VALUE)\
+if (!IsValid(POINTER))\
+{\
+	UE_LOG(LogTemp, Warning, TEXT("%s 유효하지 않음"), *POINTER->GetFName().ToString());\
+	return VALUE;\
+}
+#pragma endregion
 
 #pragma region LoadAsset
 /*    Object Asset을 받습니다.

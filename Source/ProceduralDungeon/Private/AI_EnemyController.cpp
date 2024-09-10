@@ -1,9 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AI_EnemyController.h"
+#include "Interface/INT_EnemyCharacter.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISense_Sight.h"
+#include "Navigation/PathFollowingComponent.h"
 
 AAI_EnemyController::AAI_EnemyController()
 {
@@ -24,6 +26,17 @@ void AAI_EnemyController::BeginPlay()
 	mAIPerception->OnTargetPerceptionUpdated.AddDynamic(this,&ThisClass::OnEnemyTargetPerceptionUpdated);
 }
 
+void AAI_EnemyController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	mEnemyPawn = InPawn;
+}
+
 void AAI_EnemyController::OnEnemyTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
+	if (mEnemyPawn->GetClass()->ImplementsInterface(UINT_EnemyCharacter::StaticClass())&&
+		Actor->ActorHasTag(TAG_PLAYER))
+	{
+		IINT_EnemyCharacter::Execute_AddPlayerTarget(mEnemyPawn, Actor, Stimulus.WasSuccessfullySensed());
+	}
 }

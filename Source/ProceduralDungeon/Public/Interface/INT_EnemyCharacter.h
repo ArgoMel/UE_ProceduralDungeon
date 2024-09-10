@@ -20,4 +20,8 @@ class PROCEDURALDUNGEON_API IINT_EnemyCharacter
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	ABaseEnemy* GetEnemyRef();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddPlayerTarget(AActor* PlayerTarget,bool Add);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void EnemyMeleeAttack();
 };

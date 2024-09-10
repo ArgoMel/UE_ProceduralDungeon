@@ -24,7 +24,7 @@ void UAnim_Enemy::NativeInitializeAnimation()
 	{
 		mEnemyCharacter =IINT_EnemyCharacter::Execute_GetEnemyRef(pawn);
 	}
-	else
+	if (!IsValid(mEnemyCharacter))
 	{
 		FTimerHandle tempTimer;
 		GetWorld()->GetTimerManager().SetTimer(tempTimer, this, &ThisClass::NativeInitializeAnimation, 0.2f);
