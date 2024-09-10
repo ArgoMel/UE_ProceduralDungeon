@@ -53,7 +53,7 @@ APlayer_Swordsman::APlayer_Swordsman()
 	}
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ABP_Swordsman(TEXT(
 		"/Game/_Main/Player/Swordsman/ABP_Swordsman.ABP_Swordsman_C"));
-	if (Greystone_Novaborn.Succeeded())
+	if (ABP_Swordsman.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(ABP_Swordsman.Class);
 	}

@@ -3,21 +3,25 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "AI_Player.generated.h"
+#include "Anim_Enemy.generated.h"
+
+class ABaseEnemy;
 
 UCLASS()
-class PROCEDURALDUNGEON_API UAI_Player : public UAnimInstance
+class PROCEDURALDUNGEON_API UAnim_Enemy : public UAnimInstance
 {
 	GENERATED_BODY()
 public:
-	UAI_Player();
+	UAnim_Enemy();
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
-	TObjectPtr<APawn> mPlayerPawn;
+	TObjectPtr<ABaseEnemy> mEnemyCharacter;
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	float mSpeed;
+	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	bool bIsDead;
 };

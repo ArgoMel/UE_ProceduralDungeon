@@ -2,6 +2,7 @@
 
 #include "Character/BaseCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 #include <Kismet/GameplayStatics.h>
 
 ABaseCharacter::ABaseCharacter()
@@ -60,14 +61,15 @@ void ABaseCharacter::UpdateCollisionCapsuleToFitMesh()
 	const FVector scale3D = mesh->GetRelativeScale3D();
 
 	// set collision cylinder appropriately to mesh size
-	const float newRadius = ((meshBounds.BoxExtent.X + meshBounds.BoxExtent.Y) / 2.0f)
+	const float newRadius = ((meshBounds.BoxExtent.X + meshBounds.BoxExtent.Y) * 0.5f)
 		* 0.5f * FMath::Max(scale3D.X, scale3D.Y);
 	// conversion factor based on known good capsule height from UE3 prototype.
 	const float boxHeightConversionFactor = 1.324f;
-	const float newHalfHeight = meshBounds.BoxExtent.Z * 0.5f * boxHeightConversionFactor * scale3D.Z;
+	const float newHalfHeight = meshBounds.SphereRadius * 0.5f * boxHeightConversionFactor * scale3D.Z;
 
 	// set the currently in-use cylinders
-	GetCapsuleComponent()->SetCapsuleSize(newRadius, meshBounds.BoxExtent.Z - 2.f);
+	GetCapsuleComponent()->SetCapsuleSize(newRadius, newHalfHeight-2.f);
+	//GetCapsuleComponent()->SetCapsuleSize(newRadius, meshBounds.BoxExtent.Z - 2.f);
 	GetCapsuleComponent()->SetRelativeScale3D(FVector(1.));
 
 	UpdateRelativeLocationToFitCapsule();
