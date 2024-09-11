@@ -32,4 +32,6 @@ public:
 	ABasePlayer* GetPlayerRef();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	APlayer_Swordsman* GetPlayerSwordsmanRef();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void InitializeHUD();
 };

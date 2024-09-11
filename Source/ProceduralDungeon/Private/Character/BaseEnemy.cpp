@@ -65,8 +65,11 @@ void ABaseEnemy::AddPlayerTarget_Implementation(AActor* PlayerTarget, bool Add)
 	ABasePlayer* player= IINT_PlayerCharacter::Execute_GetPlayerRef(PlayerTarget);
 	if(Add)
 	{
-		mPlayerTargets.AddUnique(player);
-		Chase();
+		if(!player->GetIsDead())
+		{
+			mPlayerTargets.AddUnique(player);
+			Chase();
+		}
 	}
 	//remove
 	else
@@ -75,6 +78,10 @@ void ABaseEnemy::AddPlayerTarget_Implementation(AActor* PlayerTarget, bool Add)
 		if(mPlayerTargets.IsEmpty())
 		{
 			GoHome();
+		}
+		else
+		{
+			Chase();
 		}
 	}
 }
@@ -88,6 +95,15 @@ void ABaseEnemy::EnemyMeleeAttack_Implementation()
 {
 	mMeleeBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	mMeleeBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ABaseEnemy::Death()
+{
+	Super::Death();
+	GetCharacterMovement()->StopMovementImmediately();
+	StopAnimMontage(mMeleeAttackMontage);
+	StopAnimMontage(mRangedAttackMontage);
+	GetCapsuleComponent()->SetCollisionProfileName(PROFILENAME_RAGDOLL);
 }
 
 void ABaseEnemy::OnMeleeBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -105,8 +121,11 @@ void ABaseEnemy::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::T
 	switch (Result)
 	{
 	case EPathFollowingResult::Success:
-		Multi_PlayMontage(mMeleeAttackMontage);
-		GetWorld()->GetTimerManager().SetTimer(tempTimer, this, &ThisClass::CheckChasing, mTimeBetweenAttacks);
+		if (bIsChasing)
+		{
+			Multi_PlayMontage(mMeleeAttackMontage);
+			GetWorld()->GetTimerManager().SetTimer(tempTimer, this, &ThisClass::Chase, mTimeBetweenAttacks);
+		}
 		break;
 	case EPathFollowingResult::Blocked:
 		break;
@@ -119,18 +138,15 @@ void ABaseEnemy::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::T
 	}
 }
 
-void ABaseEnemy::CheckChasing()
-{
-	if(bIsChasing)
-	{
-		Chase();
-	}
-}
-
 void ABaseEnemy::Chase_Implementation()
 {
 	if(bIsDead)
 	{
+		return;
+	}
+	if(mPlayerTargets[0]->GetIsDead())
+	{
+		IINT_EnemyCharacter::Execute_AddPlayerTarget(this, mPlayerTargets[0], false);
 		return;
 	}
 	AAIController* controller = Cast<AAIController>(Controller);
@@ -143,6 +159,7 @@ void ABaseEnemy::Chase_Implementation()
 
 void ABaseEnemy::GoHome_Implementation()
 {
+	bIsChasing = false;
 	if (bIsDead)
 	{
 		return;
@@ -152,28 +169,4 @@ void ABaseEnemy::GoHome_Implementation()
 	controller->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
 	controller->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::OnMoveCompleted);
 	controller->MoveToLocation(mInitialSpawnLoc, 5.f, false);
-}
-
-void ABaseEnemy::Server_Death_Implementation()
-{
-	if(bIsDead)
-	{
-		return;
-	}
-	bIsDead = true;
-	Client_Death();
-	Death();
-}
-
-void ABaseEnemy::Client_Death_Implementation()
-{
-	Death();
-}
-
-void ABaseEnemy::Death()
-{
-	GetCharacterMovement()->StopMovementImmediately();
-	StopAnimMontage(mMeleeAttackMontage);
-	StopAnimMontage(mRangedAttackMontage);
-	GetCapsuleComponent()->SetCollisionProfileName(PROFILENAME_RAGDOLL);
 }

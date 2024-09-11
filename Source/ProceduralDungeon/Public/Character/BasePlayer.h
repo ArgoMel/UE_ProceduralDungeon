@@ -24,6 +24,10 @@ protected:
 public:
 	void SetIsAttacking_Implementation(bool Attacking);
 	ABasePlayer* GetPlayerRef_Implementation();
+	void InitializeHUD_Implementation();
+public:
+	virtual void Server_Death_Implementation() override;
+	virtual void Death() override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Component")
@@ -32,11 +36,28 @@ protected:
 	TObjectPtr<UCameraComponent> mCamera;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	TSubclassOf<ABasePlayer> mCharacterClass;
+	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TObjectPtr<APC_DungeonGame> mPlayerController;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "Variable")
+	float mMaxMana;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "Variable")
+	float mCurMana;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
+	float mAction1ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
+	float mAction2ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
+	float mAction3ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
+	float mAction4ManaCost;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCurrentlyAttacking;
 
 public:
+	UFUNCTION(BlueprintPure)
+	bool CanUseMana(float ManaCost);
+
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_Action1();
 	virtual void Server_Action1_Implementation();
@@ -61,4 +82,14 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_Action4End();
 	virtual void Server_Action4End_Implementation();
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_UpdateHUD();
+	virtual void Server_UpdateHUD_Implementation();
+
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_RespawnPlayer();
+	virtual void Server_RespawnPlayer_Implementation();
+	UFUNCTION(BlueprintCallable)
+	void RespawnPlayer();
 };

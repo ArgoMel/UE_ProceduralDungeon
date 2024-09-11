@@ -16,6 +16,17 @@ APlayer_Swordsman::APlayer_Swordsman()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	mMaxHealth = 10.f;
+	mCurHealth = mMaxHealth;
+
+	mCharacterClass = GetClass();
+	mMaxMana=100.f;
+	mCurMana= mMaxMana;
+	mAction1ManaCost = 0.f;
+	mAction2ManaCost = 25.f;
+	mAction3ManaCost = 0.f;
+	mAction4ManaCost = 25.f;
+
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_A_Fast_Montage,UAnimMontage,"/Game/_Main/Player/Swordsman/Swordsman_Attack_A_Fast_Montage.Swordsman_Attack_A_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_B_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_C_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_C_Fast_Montage.Swordsman_Attack_C_Fast_Montage");
@@ -105,6 +116,13 @@ float APlayer_Swordsman::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	{
 		damage = 0.f;
 	}
+	mCurHealth -= damage;
+	Server_UpdateHUD();
+	if(mCurHealth<=0)
+	{
+		mCurHealth = 0;
+		Server_Death();
+	}
 	return damage;
 }
 
@@ -152,7 +170,9 @@ APlayer_Swordsman* APlayer_Swordsman::GetPlayerSwordsmanRef_Implementation()
 void APlayer_Swordsman::Server_Action1_Implementation()
 {
 	Super::Server_Action1_Implementation();
-	if(bCurrentlyAttacking||bIsDead)
+	if (bCurrentlyAttacking ||
+		bIsDead ||
+		!CanUseMana(mAction1ManaCost))
 	{
 		return;
 	}
@@ -167,7 +187,9 @@ void APlayer_Swordsman::Server_Action1_Implementation()
 void APlayer_Swordsman::Server_Action2_Implementation()
 {
 	Super::Server_Action2_Implementation();
-	if (bCurrentlyAttacking || bIsDead)
+	if (bCurrentlyAttacking || 
+		bIsDead||
+		!CanUseMana(mAction2ManaCost))
 	{
 		return;
 	}
@@ -184,7 +206,9 @@ void APlayer_Swordsman::Server_Action2_Implementation()
 void APlayer_Swordsman::Server_Action3_Implementation()
 {
 	Super::Server_Action3_Implementation();
-	if (bCurrentlyAttacking || bIsDead)
+	if (bCurrentlyAttacking ||
+		bIsDead ||
+		!CanUseMana(mAction3ManaCost))
 	{
 		return;
 	}
@@ -214,7 +238,9 @@ void APlayer_Swordsman::Server_Action3End_Implementation()
 void APlayer_Swordsman::Server_Action4_Implementation()
 {
 	Super::Server_Action4_Implementation();
-	if (bCurrentlyAttacking || bIsDead)
+	if (bCurrentlyAttacking ||
+		bIsDead ||
+		!CanUseMana(mAction4ManaCost))
 	{
 		return;
 	}

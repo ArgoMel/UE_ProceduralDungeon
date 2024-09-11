@@ -24,6 +24,8 @@ public:
 	void AddPlayerTarget_Implementation(AActor* PlayerTarget, bool Add);
 	ABaseEnemy* GetEnemyRef_Implementation();
 	void EnemyMeleeAttack_Implementation();
+public:
+	virtual void Death() override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere,Category = "Component")
@@ -51,8 +53,6 @@ protected:
 
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
-	UFUNCTION()
-	void CheckChasing();
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
@@ -62,15 +62,4 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void GoHome();
 	virtual void GoHome_Implementation();
-
-	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
-	void Server_Death();
-	virtual void Server_Death_Implementation();
-
-	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
-	void Client_Death();
-	virtual void Client_Death_Implementation();
-
-	UFUNCTION(BlueprintCallable)
-	void Death();
 };

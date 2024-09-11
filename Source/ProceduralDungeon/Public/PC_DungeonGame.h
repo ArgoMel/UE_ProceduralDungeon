@@ -6,6 +6,7 @@
 #include "Interface/INT_PlayerController.h"
 #include "PC_DungeonGame.generated.h"
 
+class UHUDWidget;
 class UDungeonGameIAs;
 
 UCLASS()
@@ -20,8 +21,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* aPawn) override;
-
+public:
 	void SetPlayerCanMove_Implementation(bool CanMove);
+	void UpdatePlayerHUD_Implementation(float HP, float MP);
+	void PlayerRespawn_Implementation(FVector PlayerSpawnLoc, TSubclassOf<ABasePlayer> PlayerClass);
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
@@ -29,9 +32,19 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCanMove;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly , Category = "Widget")
+	TSubclassOf<UUserWidget> mHUDClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Widget")
+	TObjectPtr<UHUDWidget> mHUD;
+
 protected:
 	UFUNCTION()
 	virtual void MoveTriggered(const FInputActionValue& Value);
+
+public:
+	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
+	void Client_UpdateHUD(float HP, float MP);
+	virtual void Client_UpdateHUD_Implementation(float HP, float MP);
 
 #pragma region EnhancedInput
 protected:

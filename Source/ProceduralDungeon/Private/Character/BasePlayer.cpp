@@ -3,6 +3,7 @@
 #include "Character/BasePlayer.h"
 #include "PC_DungeonGame.h"
 #include "Input/DungeonGameIAs.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -30,6 +31,8 @@ ABasePlayer::ABasePlayer()
 void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, mMaxMana);
+	DOREPLIFETIME(ThisClass, mCurMana);
 	DOREPLIFETIME(ThisClass, bCurrentlyAttacking);
 }
 
@@ -37,6 +40,8 @@ void ABasePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	mPlayerController = Cast<APC_DungeonGame>(NewController);
+	FTimerHandle tempTimer;
+	GetWorld()->GetTimerManager().SetTimer(tempTimer,this,&ThisClass::Server_UpdateHUD,0.3f);
 }
 
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -79,6 +84,37 @@ ABasePlayer* ABasePlayer::GetPlayerRef_Implementation()
 	return this;
 }
 
+void ABasePlayer::InitializeHUD_Implementation()
+{
+	Server_UpdateHUD();
+}
+
+void ABasePlayer::Server_Death_Implementation()
+{
+	Super::Server_Death_Implementation();
+	Server_RespawnPlayer();
+}
+
+void ABasePlayer::Death()
+{
+	Super::Death();
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_SetPlayerCanMove(mPlayerController, false);
+	}
+}
+
+bool ABasePlayer::CanUseMana(float ManaCost)
+{
+	if(ManaCost > mCurMana)
+	{
+		return false;
+	}
+	mCurMana -= ManaCost;
+	Server_UpdateHUD();
+	return true;
+}
+
 void ABasePlayer::Server_Action1_Implementation()
 {
 }
@@ -109,4 +145,33 @@ void ABasePlayer::Server_Action4_Implementation()
 
 void ABasePlayer::Server_Action4End_Implementation()
 {
+}
+
+void ABasePlayer::Server_UpdateHUD_Implementation()
+{
+	if (!IsValid(mPlayerController))
+	{
+		FTimerHandle tempTimer;
+		GetWorld()->GetTimerManager().SetTimer(tempTimer, this, &ThisClass::Server_UpdateHUD, 0.2f);
+		return;
+	}
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_UpdatePlayerHUD(mPlayerController, mCurHealth / mMaxHealth, mCurMana / mMaxMana);
+	}
+}
+
+void ABasePlayer::Server_RespawnPlayer_Implementation()
+{
+	FTimerHandle tempTimer;
+	GetWorld()->GetTimerManager().SetTimer(tempTimer, this, &ThisClass::RespawnPlayer, 2.f);
+}
+
+void ABasePlayer::RespawnPlayer()
+{
+	Destroy();
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_PlayerRespawn(mPlayerController, mInitialSpawnLoc, mCharacterClass);
+	}
 }

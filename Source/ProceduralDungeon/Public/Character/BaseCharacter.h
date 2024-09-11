@@ -49,6 +49,15 @@ public:
 	void Multi_SpawnParticle(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation = FRotator::ZeroRotator, FVector Scale = FVector(1.f));
 	virtual void Multi_SpawnParticle_Implementation(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation = FRotator::ZeroRotator, FVector Scale = FVector(1.f));
 
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_Death();
+	virtual void Server_Death_Implementation();
+	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
+	void Client_Death();
+	virtual void Client_Death_Implementation();
+	UFUNCTION(BlueprintCallable)
+	virtual void Death();
+
 	bool GetIsDead() const
 	{
 		return bIsDead;

@@ -108,3 +108,22 @@ void ABaseCharacter::Multi_SpawnParticle_Implementation(UParticleSystem* Emitter
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Location, Rotation, Scale);
 }
 
+void ABaseCharacter::Server_Death_Implementation()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+	bIsDead = true;
+	Client_Death();
+	Death();
+}
+
+void ABaseCharacter::Client_Death_Implementation()
+{
+	Death();
+}
+
+void ABaseCharacter::Death()
+{
+}

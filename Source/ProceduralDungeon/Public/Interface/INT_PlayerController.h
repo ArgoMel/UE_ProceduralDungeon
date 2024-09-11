@@ -17,4 +17,8 @@ class PROCEDURALDUNGEON_API IINT_PlayerController
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetPlayerCanMove(bool CanMove);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void UpdatePlayerHUD(float HP,float MP);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayerRespawn(FVector PlayerSpawnLoc,TSubclassOf<ABasePlayer> PlayerClass);
 };
