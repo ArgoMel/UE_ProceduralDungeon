@@ -24,6 +24,22 @@ void APC_DungeonGame::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(ThisClass, bCanMove);
 }
 
+void APC_DungeonGame::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+	SetPawn(aPawn);
+	if (mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		IINT_PlayerCharacter::Execute_InitializeHUD(mPlayerPawn);
+	}
+}
+
+void APC_DungeonGame::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	mPlayerPawn = InPawn;
+}
+
 void APC_DungeonGame::BeginPlay()
 {
 	Super::BeginPlay();
@@ -54,19 +70,6 @@ void APC_DungeonGame::SetupInputComponent()
 		return;
 	}
 	EDungeonGameIAs::BindInput_TriggerOnly(input, mDungeonGameIAs->mMove, this, &ThisClass::MoveTriggered);
-}
-
-void APC_DungeonGame::OnPossess(APawn* aPawn)
-{
-	Super::OnPossess(aPawn);
-	mPlayerPawn = aPawn;
-	if(HasAuthority())
-	{
-		if (mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
-		{
-			IINT_PlayerCharacter::Execute_InitializeHUD(mPlayerPawn);
-		}
-	}
 }
 
 void APC_DungeonGame::SetPlayerCanMove_Implementation(bool CanMove)
@@ -102,7 +105,11 @@ void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)
 
 void APC_DungeonGame::Client_UpdateHUD_Implementation(float HP, float MP)
 {
-	mHUD->UpdateHUD(HP,MP);
+	if(!mHUD)
+	{
+		return;
+	}
+	mHUD->UpdateHUD(HP, MP);
 }
 
 void APC_DungeonGame::AddInputMapping(const UInputMappingContext* InputMapping, const int32 MappingPriority) const

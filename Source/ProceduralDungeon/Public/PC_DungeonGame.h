@@ -18,9 +18,10 @@ public:
 	APC_DungeonGame();
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnPossess(APawn* aPawn) override;
+	virtual void SetPawn(APawn* InPawn) override;
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-	virtual void OnPossess(APawn* aPawn) override;
 public:
 	void SetPlayerCanMove_Implementation(bool CanMove);
 	void UpdatePlayerHUD_Implementation(float HP, float MP);

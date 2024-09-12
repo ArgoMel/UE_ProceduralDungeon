@@ -36,6 +36,9 @@ class UCreateSessionCallbackProxyAdvanced : public UOnlineBlueprintCallProxyBase
 	virtual void Activate() override;
 	// End of UOnlineBlueprintCallProxyBase interface
 
+public: 
+	void CreateAdvancedSessionCPP(UObject* InWorldContextObject, const TArray<FSessionPropertyKeyPair>& InExtraSettings, class APlayerController* PlayerController = NULL, int32 PublicConnections = 100, int32 PrivateConnections = 0, bool InbUseLAN = false, bool InbAllowInvites = true, bool InbIsDedicatedServer = false, bool InbUsePresence = true, bool InbUseLobbiesIfAvailable = true, bool InbAllowJoinViaPresence = true, bool InbAllowJoinViaPresenceFriendsOnly = false, bool InbAntiCheatProtected = false, bool InbUsesStats = false, bool InbShouldAdvertise = true, bool InbUseLobbiesVoiceChatIfAvailable = false, bool InbStartAfterCreate = true);
+
 private:
 	// Internal callback when session creation completes, optionally calls StartSession
 	void OnCreateCompleted(FName SessionName, bool bWasSuccessful);

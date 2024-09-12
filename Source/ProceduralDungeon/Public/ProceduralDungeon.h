@@ -14,6 +14,9 @@
 #define TAG_PLAYER TEXT("Player")
 #define TAG_ENEMY TEXT("Enemy")
 
+#define MAP_FIRSTLEVEL TEXT("Test")
+#define MAP_MAINMENU TEXT("MainMenu")
+
 #pragma region ValidMecro
 #define VALIDCHECK(POINTER)\
 if (!IsValid(POINTER))\
