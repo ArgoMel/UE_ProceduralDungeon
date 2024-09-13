@@ -144,6 +144,11 @@ void ABaseEnemy::Chase_Implementation()
 	{
 		return;
 	}
+	if (mPlayerTargets.IsEmpty())
+	{
+		GoHome();
+		return;
+	}
 	if(mPlayerTargets[0]->GetIsDead())
 	{
 		IINT_EnemyCharacter::Execute_AddPlayerTarget(this, mPlayerTargets[0], false);

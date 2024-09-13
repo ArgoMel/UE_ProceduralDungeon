@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MainMenu/MainMenuWidget.h"
-#include "MainMenu/PC_MainMenu.h"
+#include "MainMenu/INT_MainMenu.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/EditableTextBox.h"
 #include "Components/TextBlock.h"
@@ -85,10 +85,11 @@ void UMainMenuWidget::OnIncreasePlayerBtnClicked()
 
 void UMainMenuWidget::OnStartGameBtnClicked()
 {
-	APC_MainMenu* pc=Cast<APC_MainMenu>(GetOwningPlayer());
-	VALIDCHECK(pc);
 	int curPlayerNum = FCString::Atof(*PlayerNumText->GetText().ToString());
-	pc->HostGame(GameNameETB->GetText().ToString(), curPlayerNum);
+	if (GetOwningPlayer()->GetClass()->ImplementsInterface(UINT_MainMenu::StaticClass()))
+	{
+		IINT_MainMenu::Execute_HostGame(GetOwningPlayer(), GameNameETB->GetText().ToString(),curPlayerNum);
+	}
 }
 
 void UMainMenuWidget::RefreshGame_Implementation()

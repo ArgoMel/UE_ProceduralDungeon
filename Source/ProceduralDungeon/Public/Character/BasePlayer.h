@@ -21,6 +21,7 @@ protected:
 	/*서버에선만 실행*/
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
 	void SetIsAttacking_Implementation(bool Attacking);
 	ABasePlayer* GetPlayerRef_Implementation();
@@ -35,22 +36,31 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Component")
 	TObjectPtr<UCameraComponent> mCamera;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	UPROPERTY(BlueprintReadWrite, Category = "MustSet")
 	TSubclassOf<ABasePlayer> mCharacterClass;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mMaxMana;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mCurMana;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction1ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction2ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction3ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction4ManaCost;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction1Damage;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction2Damage;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction3Damage;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mAction4Damage;
+
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TObjectPtr<APC_DungeonGame> mPlayerController;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "Variable")
-	float mMaxMana;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "Variable")
-	float mCurMana;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
-	float mAction1ManaCost;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
-	float mAction2ManaCost;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
-	float mAction3ManaCost;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
-	float mAction4ManaCost;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCurrentlyAttacking;
 

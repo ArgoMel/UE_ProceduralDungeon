@@ -26,6 +26,8 @@ public:
 	void SetPlayerCanMove_Implementation(bool CanMove);
 	void UpdatePlayerHUD_Implementation(float HP, float MP);
 	void PlayerRespawn_Implementation(FVector PlayerSpawnLoc, TSubclassOf<ABasePlayer> PlayerClass);
+	void PlayerSelectScreenChoice_Implementation(TSubclassOf<ABasePlayer> SelectedClass);
+	void PlayerFirstSpawn_Implementation(TSubclassOf<ABasePlayer> PlayerClass, FVector SpawnLoc);
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
@@ -33,6 +35,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCanMove;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<UUserWidget> mCharacterSelectClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Widget")
+	TObjectPtr<UUserWidget> mCharacterSelect;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly , Category = "Widget")
 	TSubclassOf<UUserWidget> mHUDClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Widget")
@@ -43,6 +49,10 @@ protected:
 	virtual void MoveTriggered(const FInputActionValue& Value);
 
 public:
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_SpawnCharacter(TSubclassOf<ABasePlayer> SelectedClass);
+	virtual void Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlayer> SelectedClass);
+
 	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
 	void Client_UpdateHUD(float HP, float MP);
 	virtual void Client_UpdateHUD_Implementation(float HP, float MP);

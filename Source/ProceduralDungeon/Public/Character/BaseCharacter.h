@@ -19,12 +19,13 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mCurHealth;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mMaxHealth;
+
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	FVector mInitialSpawnLoc;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly,Replicated, Category = "Variable")
-	float mCurHealth;
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly,Replicated, Category = "Variable")
-	float mMaxHealth;
 	UPROPERTY(BlueprintReadWrite, ReplicatedUsing = "OnRep_IsDead", Category = "Variable")
 	bool bIsDead;
 

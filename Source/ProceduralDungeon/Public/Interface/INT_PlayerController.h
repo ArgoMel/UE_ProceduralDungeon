@@ -21,4 +21,8 @@ public:
 	void UpdatePlayerHUD(float HP,float MP);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlayerRespawn(FVector PlayerSpawnLoc,TSubclassOf<ABasePlayer> PlayerClass);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayerSelectScreenChoice(TSubclassOf<ABasePlayer> SelectedClass);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void PlayerFirstSpawn(TSubclassOf<ABasePlayer> PlayerClass,FVector SpawnLoc);
 };

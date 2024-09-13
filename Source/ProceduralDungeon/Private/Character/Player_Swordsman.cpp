@@ -16,7 +16,7 @@ APlayer_Swordsman::APlayer_Swordsman()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	mMaxHealth = 10.f;
+	mMaxHealth = 100.f;
 	mCurHealth = mMaxHealth;
 
 	mCharacterClass = GetClass();
@@ -26,6 +26,10 @@ APlayer_Swordsman::APlayer_Swordsman()
 	mAction2ManaCost = 25.f;
 	mAction3ManaCost = 0.f;
 	mAction4ManaCost = 25.f;
+	mAction1Damage = 5.f;
+	mAction2Damage = 10.f;
+	mAction2Damage = 0.f;
+	mAction4Damage = 25.f;
 
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_A_Fast_Montage,UAnimMontage,"/Game/_Main/Player/Swordsman/Swordsman_Attack_A_Fast_Montage.Swordsman_Attack_A_Fast_Montage");
 	AddObjectAsset(mAction1Montages, Swordsman_Attack_B_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
@@ -110,20 +114,12 @@ void APlayer_Swordsman::Tick(float DeltaTime)
 
 float APlayer_Swordsman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if(bIsBlocking&&
-		PlayerHitCheck(DamageCauser))
+		PlayerBlockCheck(DamageCauser))
 	{
-		damage = 0.f;
+		return 0.f;
 	}
-	mCurHealth -= damage;
-	Server_UpdateHUD();
-	if(mCurHealth<=0)
-	{
-		mCurHealth = 0;
-		Server_Death();
-	}
-	return damage;
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void APlayer_Swordsman::UseAction1_Implementation()
@@ -138,7 +134,11 @@ void APlayer_Swordsman::UseAction1_Implementation()
 		UKismetSystemLibrary::BoxOverlapActors(GetWorld(), boxPos, boxExtent, objectTypes,nullptr, ignoreActors, results);
 		for(auto& result: results)
 		{
-			UGameplayStatics::ApplyDamage(result,5.f,nullptr,this,nullptr);
+			if(result->ActorHasTag(TAG_PLAYER))
+			{
+				continue;
+			}
+			UGameplayStatics::ApplyDamage(result, mAction1Damage,nullptr,this,nullptr);
 		}
 	}
 }
@@ -157,7 +157,11 @@ void APlayer_Swordsman::UseAction4_Implementation()
 		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), spherePos, sphereRadius, objectTypes, nullptr, ignoreActors, results);
 		for (auto& result : results)
 		{
-			UGameplayStatics::ApplyDamage(result, 15.f, nullptr, this, nullptr);
+			if (result->ActorHasTag(TAG_PLAYER))
+			{
+				continue;
+			}
+			UGameplayStatics::ApplyDamage(result, mAction4Damage, nullptr, this, nullptr);
 		}
 	}
 }
@@ -274,13 +278,13 @@ void APlayer_Swordsman::Blink()
 
 void APlayer_Swordsman::OnBlinkBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor==this)
+	if(OtherActor->ActorHasTag(TAG_PLAYER))
 	{
 		return;
 	}
 	if (HasAuthority())
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, 15.f, nullptr, this, nullptr);
+		UGameplayStatics::ApplyDamage(OtherActor, mAction2Damage, nullptr, this, nullptr);
 		//UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetFName().ToString());
 	}
 }
@@ -306,7 +310,7 @@ void APlayer_Swordsman::CompleteBlink()
 	}
 }
 
-bool APlayer_Swordsman::PlayerHitCheck(AActor* DamageCauser) const
+bool APlayer_Swordsman::PlayerBlockCheck(AActor* DamageCauser) const
 {
 	FVector dir=(GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal();
 	dir.Z = 0.f;

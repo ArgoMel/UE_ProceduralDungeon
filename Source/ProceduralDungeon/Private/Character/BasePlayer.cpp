@@ -13,6 +13,18 @@ ABasePlayer::ABasePlayer()
 	bUseControllerRotationYaw = false;
 	Tags.Add(TAG_PLAYER);
 
+	mMaxMana = 100.f;
+	mCurMana = mMaxMana;
+	mAction1ManaCost = 0.f;
+	mAction2ManaCost = 0.f;
+	mAction3ManaCost = 0.f;
+	mAction4ManaCost = 0.f;
+	mAction1Damage = 0.f;
+	mAction2Damage = 0.f;
+	mAction3Damage = 0.f;
+	mAction4Damage = 0.f;
+	bCurrentlyAttacking = false;
+
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	mSpringArm->SetupAttachment(RootComponent);
 	mSpringArm->SetRelativeRotation(FRotator(-60.f,0.f,0.f));
@@ -33,6 +45,14 @@ void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, mMaxMana);
 	DOREPLIFETIME(ThisClass, mCurMana);
+	DOREPLIFETIME(ThisClass, mAction1ManaCost);
+	DOREPLIFETIME(ThisClass, mAction2ManaCost);
+	DOREPLIFETIME(ThisClass, mAction3ManaCost);
+	DOREPLIFETIME(ThisClass, mAction4ManaCost);
+	DOREPLIFETIME(ThisClass, mAction1Damage);
+	DOREPLIFETIME(ThisClass, mAction2Damage);
+	DOREPLIFETIME(ThisClass, mAction3Damage);
+	DOREPLIFETIME(ThisClass, mAction4Damage);
 	DOREPLIFETIME(ThisClass, bCurrentlyAttacking);
 }
 
@@ -65,6 +85,19 @@ void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EDungeonGameIAs::BindInput_StartCompleteCancel(input, dungeonGameIAs->mAction2, this, &ThisClass::Server_Action2, &ThisClass::Server_Action2End, &ThisClass::Server_Action2End);
 	EDungeonGameIAs::BindInput_StartCompleteCancel(input, dungeonGameIAs->mAction3, this, &ThisClass::Server_Action3, &ThisClass::Server_Action3End, &ThisClass::Server_Action3End);
 	EDungeonGameIAs::BindInput_StartCompleteCancel(input, dungeonGameIAs->mAction4, this, &ThisClass::Server_Action4, &ThisClass::Server_Action4End, &ThisClass::Server_Action4End);
+}
+
+float ABasePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	mCurHealth -= damage;
+	Server_UpdateHUD();
+	if (mCurHealth <= 0)
+	{
+		mCurHealth = 0;
+		Server_Death();
+	}
+	return damage;
 }
 
 void ABasePlayer::SetIsAttacking_Implementation(bool Attacking)

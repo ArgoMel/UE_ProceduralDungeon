@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Anim")
 	TObjectPtr<UAnimMontage> mAction4Montage;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Anim")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Particle")
 	TObjectPtr<UParticleSystem> mAction4Particle;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Timeline")
@@ -62,7 +62,7 @@ protected:
 	void CompleteBlink();
 
 	UFUNCTION(BlueprintPure)
-	bool PlayerHitCheck(AActor* DamageCauser) const;
+	bool PlayerBlockCheck(AActor* DamageCauser) const;
 
 public:
 	virtual void Server_Action1_Implementation() override;

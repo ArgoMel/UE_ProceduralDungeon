@@ -11,6 +11,7 @@ ABaseCharacter::ABaseCharacter()
 
 	mMaxHealth = 0;
 	mCurHealth = mCurHealth;
+
 	bIsDead = false;
 
 	GetMesh()->SetCollisionProfileName(PROFILENAME_NOCOLLISION);
