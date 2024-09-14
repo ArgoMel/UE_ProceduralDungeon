@@ -16,7 +16,8 @@ APC_DungeonGame::APC_DungeonGame()
 {
 	bCanMove = false;
 
-	GetClassAsset(mCharacterSelectClass, UUserWidget,"/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect_C");
+	//mCharacterSelectClass = FSoftClassPath("/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect_C").TryLoadClass<UUserWidget>();
+	//GetClassAsset(mCharacterSelectClass, UUserWidget,"/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect");
 	GetClassAsset(mHUDClass, UUserWidget,"/Game/_Main/Widget/WBP_HUD.WBP_HUD_C");
 
 	GetObjectAsset(mDungeonGameIAs, UDungeonGameIAs,"/Game/_Main/Inputs/DA_DungoenGameIAs.DA_DungoenGameIAs");
@@ -32,7 +33,6 @@ void APC_DungeonGame::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void APC_DungeonGame::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-	SetPawn(aPawn);
 	if (HasAuthority() &&
 		mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
 	{
@@ -50,8 +50,7 @@ void APC_DungeonGame::BeginPlay()
 {
 	Super::BeginPlay();
 	if(HasAuthority()&&
-		!UKismetSystemLibrary::IsServer(GetWorld())&&
-		!IsLocalPlayerController())
+		!UKismetSystemLibrary::IsServer(GetWorld()))
 	{
 		return;
 	}
@@ -146,10 +145,6 @@ void APC_DungeonGame::Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlay
 
 void APC_DungeonGame::Client_UpdateHUD_Implementation(float HP, float MP)
 {
-	//if(!mHUD)
-	//{
-	//	return;
-	//}
 	if(!IsValid(mHUD))
 	{
 		mHUD = CreateWidget<UHUDWidget>(this, mHUDClass);

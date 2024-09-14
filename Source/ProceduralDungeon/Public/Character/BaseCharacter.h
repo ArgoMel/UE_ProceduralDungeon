@@ -19,6 +19,9 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "AutoCollision")
+	bool bUseAutoCollision;
+
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
 	float mCurHealth;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/BasePlayer.h"
-#include "PC_DungeonGame.h"
 #include "Input/DungeonGameIAs.h"
+#include "Interface/INT_PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -59,24 +59,27 @@ void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 void ABasePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	mPlayerController = Cast<APC_DungeonGame>(NewController);
 	FTimerHandle tempTimer;
 	GetWorld()->GetTimerManager().SetTimer(tempTimer,this,&ThisClass::Server_UpdateHUD,0.3f);
+}
+
+void ABasePlayer::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+	mPlayerController = Cast<APlayerController>(NewOwner);
 }
 
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	if (!mPlayerController)
-	{
-		mPlayerController = Cast<APC_DungeonGame>(Controller);
-	}
-	if (!input || !mPlayerController)
+	if (!input || 
+		!mPlayerController||
+		!mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
 	{
 		return;
 	}
-	const UDungeonGameIAs* dungeonGameIAs = mPlayerController->GetDungeonGameIAs();
+	const UDungeonGameIAs* dungeonGameIAs = IINT_PlayerController::Execute_GetDungeonGameIAs(mPlayerController);
 	if (!dungeonGameIAs)
 	{
 		return;

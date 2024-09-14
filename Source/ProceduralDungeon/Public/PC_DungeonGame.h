@@ -70,8 +70,7 @@ public:
 	UFUNCTION()
 	void SetInput(const bool Enabled = true) const;
 
-	UFUNCTION()
-	UDungeonGameIAs* GetDungeonGameIAs() const
+	FORCEINLINE UDungeonGameIAs* GetDungeonGameIAs_Implementation() const
 	{
 		return mDungeonGameIAs;
 	}

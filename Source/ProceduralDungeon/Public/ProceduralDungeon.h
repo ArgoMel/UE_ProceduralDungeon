@@ -50,11 +50,11 @@ else \
 	RETURN_POINTER = nullptr;\
 }
 
-#define AddObjectAsset(RETURN_POINTER,NAME, CLASS_TYPE, PATH)\
-static ConstructorHelpers::FObjectFinder<CLASS_TYPE> RETURN_POINTER##NAME(TEXT(PATH));\
-if (RETURN_POINTER##NAME.Succeeded()) \
+#define AddObjectAsset(RETURN_POINTER,INDEX, CLASS_TYPE, PATH)\
+static ConstructorHelpers::FObjectFinder<CLASS_TYPE> RETURN_POINTER##INDEX(TEXT(PATH));\
+if (RETURN_POINTER##INDEX.Succeeded()) \
 {\
-    RETURN_POINTER.Add(RETURN_POINTER##NAME.Object);\
+    RETURN_POINTER.Add(RETURN_POINTER##INDEX.Object);\
 }\
 else \
 {\

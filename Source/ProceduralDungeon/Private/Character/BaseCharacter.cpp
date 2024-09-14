@@ -9,10 +9,14 @@ ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	bUseAutoCollision = true;
+
 	mMaxHealth = 0;
 	mCurHealth = mCurHealth;
 
 	bIsDead = false;
+
+	SetRootComponent(GetCapsuleComponent());
 
 	GetMesh()->SetCollisionProfileName(PROFILENAME_NOCOLLISION);
 }
@@ -29,7 +33,14 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ABaseCharacter::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	UpdateCollisionCapsuleToFitMesh();
+	if(bUseAutoCollision)
+	{
+		UpdateCollisionCapsuleToFitMesh();
+	}
+	else
+	{
+		UpdateRelativeLocationToFitCapsule();
+	}
 }
 
 void ABaseCharacter::BeginPlay()
@@ -76,7 +87,7 @@ void ABaseCharacter::UpdateCollisionCapsuleToFitMesh()
 
 	// set the currently in-use cylinders
 	GetCapsuleComponent()->SetCapsuleSize(newRadius, newHalfHeight-2.f);
-	//GetCapsuleComponent()->SetCapsuleSize(newRadius, meshBounds.BoxExtent.Z - 2.f);
+	//GetCapsuleComponent()->SetCapsuleSize(newRadius, meshBounds.BoxExtent.Z - 4.f);
 	GetCapsuleComponent()->SetRelativeScale3D(FVector(1.));
 
 	UpdateRelativeLocationToFitCapsule();

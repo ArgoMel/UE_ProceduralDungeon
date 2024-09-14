@@ -5,6 +5,8 @@
 #include "UObject/Interface.h"
 #include "INT_PlayerController.generated.h"
 
+class UDungeonGameIAs;
+
 UINTERFACE(MinimalAPI)
 class UINT_PlayerController : public UInterface
 {
@@ -25,4 +27,7 @@ public:
 	void PlayerSelectScreenChoice(TSubclassOf<ABasePlayer> SelectedClass);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlayerFirstSpawn(TSubclassOf<ABasePlayer> PlayerClass,FVector SpawnLoc);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UDungeonGameIAs* GetDungeonGameIAs() const;
 };

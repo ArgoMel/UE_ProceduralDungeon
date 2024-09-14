@@ -1,7 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player_Swordsman.h"
-#include "PC_DungeonGame.h"
 #include "Interface/INT_PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
@@ -31,10 +30,10 @@ APlayer_Swordsman::APlayer_Swordsman()
 	mAction2Damage = 0.f;
 	mAction4Damage = 25.f;
 
-	AddObjectAsset(mAction1Montages, Swordsman_Attack_A_Fast_Montage,UAnimMontage,"/Game/_Main/Player/Swordsman/Swordsman_Attack_A_Fast_Montage.Swordsman_Attack_A_Fast_Montage");
-	AddObjectAsset(mAction1Montages, Swordsman_Attack_B_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
-	AddObjectAsset(mAction1Montages, Swordsman_Attack_C_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_C_Fast_Montage.Swordsman_Attack_C_Fast_Montage");
-	AddObjectAsset(mAction1Montages, Swordsman_Attack_D_Fast_Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_D_Fast_Montage.Swordsman_Attack_D_Fast_Montage");
+	AddObjectAsset(mAction1Montages, 0,UAnimMontage,"/Game/_Main/Player/Swordsman/Swordsman_Attack_A_Fast_Montage.Swordsman_Attack_A_Fast_Montage");
+	AddObjectAsset(mAction1Montages, 1, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_B_Fast_Montage.Swordsman_Attack_B_Fast_Montage");
+	AddObjectAsset(mAction1Montages, 2, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_C_Fast_Montage.Swordsman_Attack_C_Fast_Montage");
+	AddObjectAsset(mAction1Montages, 3, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Attack_D_Fast_Montage.Swordsman_Attack_D_Fast_Montage");
 	GetObjectAsset(mAction4Montage, UAnimMontage, "/Game/_Main/Player/Swordsman/Swordsman_Ability_R_Montage.Swordsman_Ability_R_Montage");
 
 	GetObjectAsset(mAction4Particle, UParticleSystem, "/Game/_Main/Player/Swordsman/P_Swordsman_Greystone_Novaborn_LeapAOE_Constellations.P_Swordsman_Greystone_Novaborn_LeapAOE_Constellations");

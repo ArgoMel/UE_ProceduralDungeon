@@ -5,7 +5,6 @@
 #include "Interface/INT_PlayerCharacter.h"
 #include "BasePlayer.generated.h"
 
-class APC_DungeonGame;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -20,6 +19,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	/*서버에선만 실행*/
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void SetOwner(AActor* NewOwner) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
@@ -36,7 +36,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Component")
 	TObjectPtr<UCameraComponent> mCamera;
 
-	UPROPERTY(BlueprintReadWrite, Category = "MustSet")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "MustSet")
 	TSubclassOf<ABasePlayer> mCharacterClass;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
 	float mMaxMana;
@@ -60,7 +60,7 @@ protected:
 	float mAction4Damage;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
-	TObjectPtr<APC_DungeonGame> mPlayerController;
+	TObjectPtr<APlayerController> mPlayerController;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCurrentlyAttacking;
 
@@ -95,7 +95,6 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_UpdateHUD();
 	virtual void Server_UpdateHUD_Implementation();
-
 
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_RespawnPlayer();
