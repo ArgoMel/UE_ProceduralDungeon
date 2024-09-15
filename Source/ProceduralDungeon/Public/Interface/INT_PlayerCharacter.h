@@ -34,4 +34,6 @@ public:
 	APlayer_Swordsman* GetPlayerSwordsmanRef();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void InitializeHUD();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HealPlayer(float HealAmount);
 };

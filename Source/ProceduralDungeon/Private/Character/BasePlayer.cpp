@@ -125,6 +125,16 @@ void ABasePlayer::InitializeHUD_Implementation()
 	Server_UpdateHUD();
 }
 
+void ABasePlayer::HealPlayer_Implementation(float HealAmount)
+{
+	if (bIsDead)
+	{
+		return;
+	}
+	mCurHealth =FMath::Clamp(mCurHealth+HealAmount,0.f,mMaxHealth);
+	Server_UpdateHUD();
+}
+
 void ABasePlayer::Server_Death_Implementation()
 {
 	Super::Server_Death_Implementation();

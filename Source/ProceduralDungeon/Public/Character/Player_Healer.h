@@ -13,10 +13,14 @@ public:
 	APlayer_Healer();
 public:
 	virtual void Server_Action1_Implementation() override;
+	virtual void Server_Action2_Implementation() override;
 public:
 	void UseAction1_Implementation();
+	void UseAction2_Implementation();
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Anim")
 	TArray<UAnimMontage*> mAction1Montages;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Anim")
+	TObjectPtr<UAnimMontage> mAction2Montage;
 };

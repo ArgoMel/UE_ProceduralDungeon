@@ -26,6 +26,7 @@ public:
 	void SetIsAttacking_Implementation(bool Attacking);
 	ABasePlayer* GetPlayerRef_Implementation();
 	void InitializeHUD_Implementation();
+	void HealPlayer_Implementation(float HealAmount);
 public:
 	virtual void Server_Death_Implementation() override;
 	virtual void Death() override;
