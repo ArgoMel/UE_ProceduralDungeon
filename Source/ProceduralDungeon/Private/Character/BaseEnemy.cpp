@@ -99,7 +99,14 @@ void ABaseEnemy::EnemyMeleeAttack_Implementation()
 
 void ABaseEnemy::HandleDeath_Implementation()
 {
+	Super::HandleDeath();
 	Death();
+}
+
+void ABaseEnemy::Server_Death_Implementation()
+{
+	Super::Server_Death_Implementation();
+	OnEnemyDies.Broadcast(this);
 }
 
 void ABaseEnemy::Death()

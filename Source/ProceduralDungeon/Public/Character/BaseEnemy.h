@@ -9,6 +9,8 @@
 class UBoxComponent;
 class ABasePlayer;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyDies, ABaseEnemy*, DeadEnemy);
+
 UCLASS()
 class PROCEDURALDUNGEON_API ABaseEnemy : public ABaseCharacter
 	, public IINT_EnemyCharacter
@@ -26,6 +28,7 @@ public:
 	void EnemyMeleeAttack_Implementation();
 public:
 	virtual void HandleDeath_Implementation();
+	virtual void Server_Death_Implementation() override;
 	virtual void Death() override;
 
 protected:
@@ -47,6 +50,10 @@ protected:
 	float mMeleeDamage;
 	UPROPERTY(BlueprintReadWrite, Replicated,Category = "Variable")
 	bool bIsChasing;
+
+public:
+	UPROPERTY(BlueprintAssignable,BlueprintCallable, Category = "Event")
+	FEnemyDies OnEnemyDies;
 
 protected:
 	UFUNCTION()

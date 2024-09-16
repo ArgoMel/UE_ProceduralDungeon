@@ -121,7 +121,7 @@ void APlayer_Healer::Server_Action4_Implementation()
 	Super::Server_Action4_Implementation();
 	if (bCurrentlyAttacking ||
 		bIsDead ||
-		!CanUseMana(mAction4ManaCost, false))
+		!CanUseMana(mAction4ManaCost))
 	{
 		return;
 	}

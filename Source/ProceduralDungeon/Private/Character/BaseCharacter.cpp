@@ -12,7 +12,7 @@ ABaseCharacter::ABaseCharacter()
 	bUseAutoCollision = true;
 
 	mMaxHealth = 0;
-	mCurHealth = mCurHealth;
+	mCurHealth = mMaxHealth;
 
 	bIsDead = false;
 

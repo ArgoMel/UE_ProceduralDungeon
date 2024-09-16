@@ -23,6 +23,7 @@ ABasePlayer::ABasePlayer()
 	mAction2Damage = 0.f;
 	mAction3Damage = 0.f;
 	mAction4Damage = 0.f;
+	mManaRegenOverTime = 0.025f;
 	bCurrentlyAttacking = false;
 
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -32,6 +33,7 @@ ABasePlayer::ABasePlayer()
 	mSpringArm->bInheritPitch=false;
 	mSpringArm->bInheritRoll=false;
 	mSpringArm->bInheritYaw=false;
+	mSpringArm->bDoCollisionTest=false;
 
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mCamera->SetupAttachment(mSpringArm);
@@ -150,6 +152,16 @@ void ABasePlayer::Death()
 	}
 }
 
+void ABasePlayer::RegenManaTimer()
+{
+	mCurMana = FMath::Clamp(mCurMana+ mManaRegenOverTime,0.f,mMaxMana);
+	Server_UpdateHUD();
+	if(mCurMana==mMaxMana)
+	{
+		Server_RegenManaTimerStop();
+	}
+}
+
 bool ABasePlayer::CanUseMana(float ManaCost, bool ReduceInstant)
 {
 	if(ManaCost > mCurMana)
@@ -160,6 +172,7 @@ bool ABasePlayer::CanUseMana(float ManaCost, bool ReduceInstant)
 	{
 		mCurMana -= ManaCost;
 		Server_UpdateHUD();
+		Server_RegenMana();
 	}
 	return true;
 }
@@ -223,4 +236,19 @@ void ABasePlayer::RespawnPlayer()
 	{
 		IINT_PlayerController::Execute_PlayerRespawn(mPlayerController, mInitialSpawnLoc, mCharacterClass);
 	}
+}
+
+void ABasePlayer::Server_RegenMana_Implementation()
+{
+	if(mCurMana>=mMaxMana||
+		mManaRegenTimer.IsValid())
+	{
+		return;
+	}
+	GetWorld()->GetTimerManager().SetTimer(mManaRegenTimer,this,&ThisClass::RegenManaTimer,0.01f,true);
+}
+
+void ABasePlayer::Server_RegenManaTimerStop_Implementation()
+{
+	GetWorld()->GetTimerManager().ClearTimer(mManaRegenTimer);
 }

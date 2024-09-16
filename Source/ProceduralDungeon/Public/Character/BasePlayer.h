@@ -59,11 +59,19 @@ protected:
 	float mAction3Damage;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
 	float mAction4Damage;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	float mManaRegenOverTime;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TObjectPtr<APlayerController> mPlayerController;
+	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	FTimerHandle mManaRegenTimer;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	bool bCurrentlyAttacking;
+
+protected:
+	UFUNCTION()
+	void RegenManaTimer();
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -102,4 +110,11 @@ public:
 	virtual void Server_RespawnPlayer_Implementation();
 	UFUNCTION(BlueprintCallable)
 	void RespawnPlayer();
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_RegenMana();
+	virtual void Server_RegenMana_Implementation();
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_RegenManaTimerStop();
+	virtual void Server_RegenManaTimerStop_Implementation();
 };

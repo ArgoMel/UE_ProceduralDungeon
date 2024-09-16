@@ -43,6 +43,7 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void HandleDeath();
+	virtual void HandleDeath_Implementation() {};
 
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable,Category = "Multicast")
 	void Multi_PlayMontage(UAnimMontage* MontageToPlay);

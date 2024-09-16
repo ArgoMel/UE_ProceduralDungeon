@@ -19,6 +19,12 @@
 #define MAP_MAINMENU TEXT("MainMenu")
 
 #pragma region ValidMecro
+#define NULLCHECK(POINTER)\
+if (!POINTER)\
+{\
+	return;\
+}
+
 #define VALIDCHECK(POINTER)\
 if (!IsValid(POINTER))\
 {\
