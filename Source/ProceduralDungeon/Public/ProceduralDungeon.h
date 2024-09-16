@@ -9,6 +9,7 @@
 #define PROFILENAME_PAWN TEXT("Pawn")
 #define PROFILENAME_BLINK TEXT("Blink")
 #define PROFILENAME_ENEMYATTACK TEXT("EnemyAttack")
+#define PROFILENAME_PLAYERATTACK TEXT("PlayerAttack")
 #define PROFILENAME_NOCOLLISION TEXT("NoCollision")
 
 #define TAG_PLAYER TEXT("Player")

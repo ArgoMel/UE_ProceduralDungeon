@@ -150,14 +150,17 @@ void ABasePlayer::Death()
 	}
 }
 
-bool ABasePlayer::CanUseMana(float ManaCost)
+bool ABasePlayer::CanUseMana(float ManaCost, bool ReduceInstant)
 {
 	if(ManaCost > mCurMana)
 	{
 		return false;
 	}
-	mCurMana -= ManaCost;
-	Server_UpdateHUD();
+	if(ReduceInstant)
+	{
+		mCurMana -= ManaCost;
+		Server_UpdateHUD();
+	}
 	return true;
 }
 

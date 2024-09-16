@@ -25,6 +25,7 @@ public:
 	ABaseEnemy* GetEnemyRef_Implementation();
 	void EnemyMeleeAttack_Implementation();
 public:
+	virtual void HandleDeath_Implementation();
 	virtual void Death() override;
 
 protected:

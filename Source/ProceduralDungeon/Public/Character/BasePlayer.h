@@ -67,7 +67,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool CanUseMana(float ManaCost);
+	bool CanUseMana(float ManaCost,bool ReduceInstant=true);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_Action1();

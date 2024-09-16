@@ -103,6 +103,10 @@ void ABaseCharacter::UpdateRelativeLocationToFitCapsule() const
 
 void ABaseCharacter::OnRep_IsDead()
 {
+	if(bIsDead)
+	{
+		HandleDeath();
+	}
 }
 
 void ABaseCharacter::Multi_PlayMontage_Implementation(UAnimMontage* MontageToPlay)

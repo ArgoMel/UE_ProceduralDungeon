@@ -41,6 +41,9 @@ protected:
 	virtual void OnRep_IsDead();
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HandleDeath();
+
 	UFUNCTION(BlueprintCallable, NetMulticast, Reliable,Category = "Multicast")
 	void Multi_PlayMontage(UAnimMontage* MontageToPlay);
 	virtual void Multi_PlayMontage_Implementation(UAnimMontage* MontageToPlay);

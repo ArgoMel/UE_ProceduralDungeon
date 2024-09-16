@@ -97,6 +97,11 @@ void ABaseEnemy::EnemyMeleeAttack_Implementation()
 	mMeleeBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void ABaseEnemy::HandleDeath_Implementation()
+{
+	Death();
+}
+
 void ABaseEnemy::Death()
 {
 	Super::Death();
