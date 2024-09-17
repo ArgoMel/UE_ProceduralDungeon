@@ -60,6 +60,13 @@ void ABasePickup::OnPickupSphereBeginOverlap(UPrimitiveComponent* OverlappedComp
 	}
 }
 
+void ABasePickup::AdjustLoc()
+{
+	FVector curLoc = GetActorLocation();
+	curLoc.Z -= mPickupSphere->GetScaledSphereRadius() * 0.5f;
+	SetActorLocation(curLoc);
+}
+
 void ABasePickup::GoldPickup_Implementation(AActor* Player)
 {
 	APlayerController* pc=UGameplayStatics::GetPlayerController(GetWorld(),0);

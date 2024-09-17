@@ -7,6 +7,9 @@ AMainMenuCharacter::AMainMenuCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	RootComponent= CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(RootComponent);
+
 	mCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	mCamera->SetupAttachment(GetRootComponent());
 	mCamera->bUsePawnControlRotation=true;

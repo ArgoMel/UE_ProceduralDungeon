@@ -2,6 +2,7 @@
 
 #include "Character/BaseEnemy.h"
 #include "Character/BasePlayer.h"
+#include "Actor/BasePickup.h"
 #include "AI_EnemyController.h"
 #include "Interface/INT_PlayerCharacter.h"
 #include "Components/BoxComponent.h"
@@ -19,6 +20,8 @@ ABaseEnemy::ABaseEnemy()
 	mMaxHealth = 10;
 	mCurHealth = mMaxHealth;
 
+	mDropPercent = 0.f;
+
 	mAttackDistance = 50.f;
 	mTimeBetweenAttacks = 2.f;
 	mMeleeDamage = 5.f;
@@ -35,6 +38,7 @@ ABaseEnemy::ABaseEnemy()
 void ABaseEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, mDeathSound);
 	DOREPLIFETIME(ThisClass, mPlayerTargets);
 	DOREPLIFETIME(ThisClass, bIsChasing);
 }
@@ -100,18 +104,29 @@ void ABaseEnemy::EnemyMeleeAttack_Implementation()
 
 void ABaseEnemy::HandleDeath_Implementation()
 {
-	Super::HandleDeath();
+	Super::HandleDeath_Implementation();
 	Death();
 }
 
 void ABaseEnemy::Server_Death_Implementation(AActor* Player)
 {
 	Super::Server_Death_Implementation(Player);
+	Multi_PlaySFX(mDeathSound,GetActorLocation());
 	if (Player->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
 	{
 		IINT_PlayerCharacter::Execute_AddKill(Player);
 	}
 	OnEnemyDies.Broadcast(this);
+	TSubclassOf<ABasePickup> itempToDrop;
+	FActorSpawnParameters param = FActorSpawnParameters();
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if(DropItem(itempToDrop))
+	{
+		ABasePickup* pickup=GetWorld()->SpawnActor<ABasePickup>(itempToDrop, GetActorLocation() , FRotator::ZeroRotator, param);
+		pickup->AdjustLoc();
+	}
+	FTimerHandle tempTimer;
+	GetWorld()->GetTimerManager().SetTimer(tempTimer,this,&ThisClass::DelayDestroy,10.f);
 }
 
 void ABaseEnemy::Death()
@@ -121,6 +136,8 @@ void ABaseEnemy::Death()
 	StopAnimMontage(mMeleeAttackMontage);
 	StopAnimMontage(mRangedAttackMontage);
 	GetCapsuleComponent()->SetCollisionProfileName(PROFILENAME_RAGDOLL);
+	GetCharacterMovement()->SetAvoidanceEnabled(false);
+	DetachFromControllerPendingDestroy();
 }
 
 void ABaseEnemy::OnMeleeBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -153,6 +170,27 @@ void ABaseEnemy::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::T
 	case EPathFollowingResult::Invalid:
 		break;
 	}
+}
+
+void ABaseEnemy::DelayDestroy()
+{
+	Destroy();
+}
+
+bool ABaseEnemy::DropItem(TSubclassOf<ABasePickup>& ItemToDrop)
+{
+	if(mDroppables.IsEmpty())
+	{
+		return false;
+	}
+	float randNum=FMath::RandRange(0.f,100.f);
+	if(randNum<=mDropPercent)
+	{
+		int32 randIndex = FMath::RandRange(0, mDroppables.Num()-1);
+		ItemToDrop = mDroppables[randIndex];
+		return true;
+	}
+	return false;
 }
 
 void ABaseEnemy::Chase_Implementation()

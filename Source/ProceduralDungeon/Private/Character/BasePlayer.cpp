@@ -55,6 +55,7 @@ void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ThisClass, mAction2Damage);
 	DOREPLIFETIME(ThisClass, mAction3Damage);
 	DOREPLIFETIME(ThisClass, mAction4Damage);
+	DOREPLIFETIME(ThisClass, mManaRegenOverTime);
 	DOREPLIFETIME(ThisClass, bCurrentlyAttacking);
 }
 

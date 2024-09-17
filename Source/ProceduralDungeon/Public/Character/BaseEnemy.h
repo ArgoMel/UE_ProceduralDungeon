@@ -8,6 +8,7 @@
 
 class UBoxComponent;
 class ABasePlayer;
+class ABasePickup;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyDies, ABaseEnemy*, DeadEnemy);
 
@@ -40,6 +41,13 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Anim")
 	TObjectPtr<UAnimMontage> mRangedAttackMontage;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "MustSet")
+	TArray<TSubclassOf<ABasePickup>> mDroppables;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Replicated, Category = "MustSet")
+	TObjectPtr<USoundBase> mDeathSound;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "MustSet")
+	float mDropPercent;
+
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
 	TArray<ABasePlayer*> mPlayerTargets;
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Variable")
@@ -62,7 +70,13 @@ protected:
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
+	UFUNCTION()
+	void DelayDestroy();
+
 public:
+	UFUNCTION(BlueprintPure)
+	bool DropItem(TSubclassOf<ABasePickup>& ItemToDrop);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Chase();
 	virtual void Chase_Implementation();

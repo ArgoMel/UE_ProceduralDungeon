@@ -7,6 +7,10 @@ AEnemy_Grub::AEnemy_Grub()
 {
 	GetObjectAsset(mMeleeAttackMontage, UAnimMontage, "/Game/_Main/Enemy/Grub/Grub_Clot_Worm_React_Heavy_Front_Montage.Grub_Clot_Worm_React_Heavy_Front_Montage");
 
+	GetObjectAsset(mDeathSound, USoundBase, "/Game/_Main/Enemy/Grub/GrubDeath_Cue.GrubDeath_Cue");
+
+	mDropPercent = 50.f;
+
 	GetMesh()->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 	GetMesh()->SetRelativeScale3D(FVector(0.25f));
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_Enemy_Clot_Worm(TEXT(
