@@ -3,22 +3,27 @@
 #include "PC_DungeonGame.h"
 #include "Character/BasePlayer.h"
 #include "Widget/HUDWidget.h"
+#include "Widget/GameStatsWidget.h"
 #include "Interface/INT_PlayerCharacter.h"
 #include "Interface/INT_GameMode.h"
 #include "Input/DungeonGameIAs.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerState.h"
 #include <Kismet/KismetMathLibrary.h>
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
 APC_DungeonGame::APC_DungeonGame()
 {
+	mGold = 0;
+	mKillCount = 0;
 	bCanMove = false;
 
 	//mCharacterSelectClass = FSoftClassPath("/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect_C").TryLoadClass<UUserWidget>();
 	//GetClassAsset(mCharacterSelectClass, UUserWidget,"/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect");
 	GetClassAsset(mHUDClass, UUserWidget,"/Game/_Main/Widget/WBP_HUD.WBP_HUD_C");
+	GetClassAsset(mGameStatsClass, UUserWidget,"/Game/_Main/Widget/WBP_GameStats.WBP_GameStats_C");
 
 	GetObjectAsset(mDungeonGameIAs, UDungeonGameIAs,"/Game/_Main/Inputs/DA_DungoenGameIAs.DA_DungoenGameIAs");
 }
@@ -27,6 +32,7 @@ void APC_DungeonGame::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, mPlayerPawn);
+	DOREPLIFETIME(ThisClass, mGold);
 	DOREPLIFETIME(ThisClass, bCanMove);
 }
 
@@ -85,6 +91,7 @@ void APC_DungeonGame::SetupInputComponent()
 		return;
 	}
 	EDungeonGameIAs::BindInput_TriggerOnly(input, mDungeonGameIAs->mMove, this, &ThisClass::MoveTriggered);
+	EDungeonGameIAs::BindInput_StartCompleteCancel(input, mDungeonGameIAs->mPlayerStats, this, &ThisClass::Server_GetStats, &ThisClass::PlayerStatsCompleted, &ThisClass::PlayerStatsCompleted);
 }
 
 void APC_DungeonGame::SetPlayerCanMove_Implementation(bool CanMove)
@@ -94,7 +101,7 @@ void APC_DungeonGame::SetPlayerCanMove_Implementation(bool CanMove)
 
 void APC_DungeonGame::UpdatePlayerHUD_Implementation(float HP, float MP)
 {
-	Client_UpdateHUD(HP,MP);
+	Client_UpdateHUD(HP,MP,mGold);
 }
 
 void APC_DungeonGame::PlayerRespawn_Implementation(FVector PlayerSpawnLoc, TSubclassOf<ABasePlayer> PlayerClass)
@@ -123,6 +130,43 @@ void APC_DungeonGame::PlayerFirstSpawn_Implementation(TSubclassOf<ABasePlayer> P
 	bCanMove = true;
 }
 
+void APC_DungeonGame::AddGold_Implementation(int32 Amount)
+{
+	mGold += Amount;
+	if (mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		IINT_PlayerCharacter::Execute_InitializeHUD(mPlayerPawn);
+	}
+}
+
+void APC_DungeonGame::AddKill_Implementation()
+{
+	++mKillCount;
+}
+
+APC_DungeonGame* APC_DungeonGame::GetDungeonPCRef_Implementation()
+{
+	return this;
+}
+
+FPlayerStats APC_DungeonGame::GetPlayerStats_Implementation()
+{
+	FPlayerStats playerStats;
+	playerStats.PlayerName = PlayerState->GetPlayerName();
+	playerStats.Gold = mGold;
+	playerStats.KillCount = mKillCount;
+	if (mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		ABasePlayer* player = IINT_PlayerCharacter::Execute_GetPlayerRef(mPlayerPawn);
+		if(IsValid(player))
+		{
+			playerStats.HealthPCT = player->GetCurHP() / player->GetMaxHP();
+			playerStats.ManaPCT = player->GetCurMP() / player->GetMaxMP();
+		}
+	}
+	return playerStats;
+}
+
 void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)
 {
 	if (!IsValid(mPlayerPawn)||!bCanMove)
@@ -134,6 +178,14 @@ void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)
 	mPlayerPawn->AddMovementInput(UKismetMathLibrary::GetRightVector(mPlayerPawn->GetControlRotation()), value.X);
 }
 
+void APC_DungeonGame::PlayerStatsCompleted()
+{
+	if (IsValid(mGameStats))
+	{
+		mGameStats->RemoveFromParent();
+	}
+}
+
 void APC_DungeonGame::Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlayer> SelectedClass)
 {
 	AGameModeBase* gameMode= UGameplayStatics::GetGameMode(GetWorld());
@@ -143,14 +195,41 @@ void APC_DungeonGame::Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlay
 	}
 }
 
-void APC_DungeonGame::Client_UpdateHUD_Implementation(float HP, float MP)
+void APC_DungeonGame::Server_GetStats_Implementation()
+{
+	AGameModeBase* gm= UGameplayStatics::GetGameMode(GetWorld());
+	TArray<FPlayerStats> playerStats;
+	if (gm->GetClass()->ImplementsInterface(UINT_GameMode::StaticClass()))
+	{
+		IINT_GameMode::Execute_GetPlayerStats(gm, playerStats);
+	}
+	Client_GetStats(playerStats);
+}
+
+void APC_DungeonGame::Client_GetStats_Implementation(const TArray<FPlayerStats>& PlayerStats)
+{
+	if (!IsValid(mGameStats))
+	{
+		mGameStats = CreateWidget<UGameStatsWidget>(this, mGameStatsClass);
+		mGameStats->Clear();
+	}
+	int32 index = 0;
+	for (FPlayerStats playerStat : PlayerStats)
+	{
+		mGameStats->AddChild(index, &playerStat);
+		++index;
+	}
+	mGameStats->AddToViewport();
+}
+
+void APC_DungeonGame::Client_UpdateHUD_Implementation(float HP, float MP, int32 Gold)
 {
 	if(!IsValid(mHUD))
 	{
 		mHUD = CreateWidget<UHUDWidget>(this, mHUDClass);
 		mHUD->AddToViewport();
 	}
-	mHUD->UpdateHUD(HP, MP);
+	mHUD->UpdateHUD(HP, MP, Gold);
 }
 
 void APC_DungeonGame::AddInputMapping(const UInputMappingContext* InputMapping, const int32 MappingPriority) const

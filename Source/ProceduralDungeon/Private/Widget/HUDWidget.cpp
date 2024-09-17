@@ -2,9 +2,11 @@
 
 #include "Widget/HUDWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
-void UHUDWidget::UpdateHUD(float HP, float MP)
+void UHUDWidget::UpdateHUD(float HP, float MP, int32 Gold)
 {
 	HealthBar->SetPercent(HP);
 	ManaBar->SetPercent(MP);
+	GoldAmountText->SetText(FText::AsNumber(Gold));
 }

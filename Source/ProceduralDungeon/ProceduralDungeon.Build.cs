@@ -20,6 +20,7 @@ public class ProceduralDungeon : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] 
 		{
             "NavigationSystem"
+            //,"AdvancedSessions"
         });
 
 		// Uncomment if you are using Slate UI

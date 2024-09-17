@@ -36,4 +36,6 @@ public:
 	void InitializeHUD();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void HealPlayer(float HealAmount);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddKill();
 };

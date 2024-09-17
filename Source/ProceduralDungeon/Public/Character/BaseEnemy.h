@@ -28,7 +28,7 @@ public:
 	void EnemyMeleeAttack_Implementation();
 public:
 	virtual void HandleDeath_Implementation();
-	virtual void Server_Death_Implementation() override;
+	virtual void Server_Death_Implementation(AActor* Player = nullptr) override;
 	virtual void Death() override;
 
 protected:

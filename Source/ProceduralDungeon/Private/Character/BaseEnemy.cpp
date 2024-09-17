@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/DamageEvents.h"
 #include <Kismet/GameplayStatics.h>
 
 ABaseEnemy::ABaseEnemy()
@@ -51,7 +52,7 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 	if(mCurHealth<=0)
 	{
 		mCurHealth = 0;
-		Server_Death();
+		Server_Death(DamageCauser);
 	}
 	return damage;
 }
@@ -103,9 +104,13 @@ void ABaseEnemy::HandleDeath_Implementation()
 	Death();
 }
 
-void ABaseEnemy::Server_Death_Implementation()
+void ABaseEnemy::Server_Death_Implementation(AActor* Player)
 {
-	Super::Server_Death_Implementation();
+	Super::Server_Death_Implementation(Player);
+	if (Player->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		IINT_PlayerCharacter::Execute_AddKill(Player);
+	}
 	OnEnemyDies.Broadcast(this);
 }
 
@@ -124,7 +129,7 @@ void ABaseEnemy::OnMeleeBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent
 	{
 		return;
 	}
-	UGameplayStatics::ApplyDamage(OtherActor, mMeleeDamage, nullptr, this, nullptr);
+	OtherActor->TakeDamage(mMeleeDamage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(),0), this);
 }
 
 void ABaseEnemy::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
@@ -156,12 +161,13 @@ void ABaseEnemy::Chase_Implementation()
 	{
 		return;
 	}
-	if (mPlayerTargets.IsEmpty())
+	if (mPlayerTargets.IsEmpty()||
+		!IsValid(mPlayerTargets[0]))
 	{
 		GoHome();
 		return;
 	}
-	if(mPlayerTargets[0]->GetIsDead())
+	if(	mPlayerTargets[0]->GetIsDead())
 	{
 		IINT_EnemyCharacter::Execute_AddPlayerTarget(this, mPlayerTargets[0], false);
 		return;
@@ -169,8 +175,7 @@ void ABaseEnemy::Chase_Implementation()
 	AAIController* controller = Cast<AAIController>(Controller);
 	VALIDCHECK(controller);
 	bIsChasing = true;
-	controller->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
-	controller->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::OnMoveCompleted);
+	controller->ReceiveMoveCompleted.AddUniqueDynamic(this, &ThisClass::OnMoveCompleted);
 	controller->MoveToActor(mPlayerTargets[0], mAttackDistance,false);
 }
 

@@ -47,7 +47,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	mInitialSpawnLoc=GetActorLocation();
-}
+} 
 
 void ABaseCharacter::Tick(float DeltaTime)
 {
@@ -124,7 +124,7 @@ void ABaseCharacter::Multi_SpawnParticle_Implementation(UParticleSystem* Emitter
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Location, Rotation, Scale);
 }
 
-void ABaseCharacter::Server_Death_Implementation()
+void ABaseCharacter::Server_Death_Implementation(AActor* Player)
 {
 	if (bIsDead)
 	{

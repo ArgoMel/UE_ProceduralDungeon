@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "CoreMinimal.h"
+#include "ProceduralDungeon.h"
 #include "UObject/Interface.h"
 #include "INT_PlayerController.generated.h"
 
+class APC_DungeonGame;
 class UDungeonGameIAs;
 
 UINTERFACE(MinimalAPI)
@@ -27,7 +28,15 @@ public:
 	void PlayerSelectScreenChoice(TSubclassOf<ABasePlayer> SelectedClass);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void PlayerFirstSpawn(TSubclassOf<ABasePlayer> PlayerClass,FVector SpawnLoc);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddGold(int32 Amount);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddKill();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	APC_DungeonGame* GetDungeonPCRef();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FPlayerStats GetPlayerStats();
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	UDungeonGameIAs* GetDungeonGameIAs() const;
 };

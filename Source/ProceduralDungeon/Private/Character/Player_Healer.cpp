@@ -6,6 +6,7 @@
 #include <Kismet/KismetSystemLibrary.h>
 #include "Engine/DamageEvents.h"
 #include <Kismet/KismetMathLibrary.h>
+#include <Kismet/GameplayStatics.h>
 
 APlayer_Healer::APlayer_Healer()
 {
@@ -149,7 +150,7 @@ void APlayer_Healer::UseAction1_Implementation()
 			{
 				continue;
 			}
-			result->TakeDamage(mAction1Damage, FDamageEvent(), nullptr, this);
+			result->TakeDamage(mAction1Damage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), this);
 		}
 	}
 }
@@ -248,7 +249,7 @@ void APlayer_Healer::ConcentrateHandle_Implementation()
 			{
 				continue;
 			}
-			result->TakeDamage(mAction3Damage, FDamageEvent(), nullptr, this);
+			result->TakeDamage(mAction3Damage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), this);
 		}
 	}
 }

@@ -6,6 +6,7 @@
 #include "HUDWidget.generated.h"
 
 class UProgressBar;
+class UTextBlock;
 
 UCLASS(Abstract)
 class PROCEDURALDUNGEON_API UHUDWidget : public UUserWidget
@@ -17,7 +18,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	TObjectPtr<UProgressBar> ManaBar;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UTextBlock> GoldAmountText;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Event")
-	void UpdateHUD(float HP,float MP);
+	void UpdateHUD(float HP,float MP,int32 Gold);
 };

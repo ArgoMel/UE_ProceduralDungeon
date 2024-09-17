@@ -19,7 +19,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	/*서버에선만 실행*/
 	virtual void PossessedBy(AController* NewController) override;
-	virtual void SetOwner(AActor* NewOwner) override;
+	virtual void OnRep_Owner() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
@@ -27,8 +27,9 @@ public:
 	ABasePlayer* GetPlayerRef_Implementation();
 	void InitializeHUD_Implementation();
 	void HealPlayer_Implementation(float HealAmount);
+	void AddKill_Implementation();
 public:
-	virtual void Server_Death_Implementation() override;
+	virtual void Server_Death_Implementation(AActor* Player = nullptr) override;
 	virtual void Death() override;
 
 protected:
@@ -117,4 +118,13 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_RegenManaTimerStop();
 	virtual void Server_RegenManaTimerStop_Implementation();
+
+	float GetCurMP() const
+	{
+		return mCurMana;
+	}
+	float GetMaxMP() const
+	{
+		return mMaxMana;
+	}
 };

@@ -6,6 +6,7 @@
 #include "Engine/DamageEvents.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Kismet/GameplayStatics.h>
 
 AHealerProjectile::AHealerProjectile()
 {
@@ -45,7 +46,7 @@ void AHealerProjectile::OnProjectileBeginOverlap(UPrimitiveComponent* Overlapped
 			Multi_SpawnParticle(mHitParticle, startPos);
 
 			mHitEnemies.Add(OtherActor);
-			OtherActor->TakeDamage(mDamage, FDamageEvent(), nullptr, GetOwner());
+			OtherActor->TakeDamage(mDamage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), GetOwner());
 
 			if (GetOwner()->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
 			{

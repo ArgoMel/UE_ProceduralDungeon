@@ -12,12 +12,19 @@ APC_MainMenu::APC_MainMenu()
 void APC_MainMenu::BeginPlay()
 {
 	Super::BeginPlay();
-	mMainMenu = CreateWidget<UUserWidget>(this, mMainMenuClass);
-	mMainMenu->AddToViewport();
-	FInputModeGameAndUI inputmode;
-	inputmode.SetWidgetToFocus(mMainMenu->GetCachedWidget());
-	inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
-	inputmode.SetHideCursorDuringCapture(false);
-	SetInputMode(inputmode);
-	SetShowMouseCursor(true);
+	if(HasAuthority())
+	{
+	
+	}
+	else
+	{
+		mMainMenu = CreateWidget<UUserWidget>(this, mMainMenuClass);
+		mMainMenu->AddToViewport();
+		FInputModeGameAndUI inputmode;
+		inputmode.SetWidgetToFocus(mMainMenu->GetCachedWidget());
+		inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
+		inputmode.SetHideCursorDuringCapture(false);
+		SetInputMode(inputmode);
+		SetShowMouseCursor(true);
+	}
 }

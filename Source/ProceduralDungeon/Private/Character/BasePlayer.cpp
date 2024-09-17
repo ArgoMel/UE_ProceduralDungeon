@@ -27,7 +27,7 @@ ABasePlayer::ABasePlayer()
 	bCurrentlyAttacking = false;
 
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	mSpringArm->SetupAttachment(RootComponent);
+	mSpringArm->SetupAttachment(GetCapsuleComponent());
 	mSpringArm->SetRelativeRotation(FRotator(-60.f,0.f,0.f));
 	mSpringArm->TargetArmLength=1250.f;
 	mSpringArm->bInheritPitch=false;
@@ -61,14 +61,15 @@ void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 void ABasePlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	mPlayerController = Cast<APlayerController>(NewController);
 	FTimerHandle tempTimer;
 	GetWorld()->GetTimerManager().SetTimer(tempTimer,this,&ThisClass::Server_UpdateHUD,0.3f);
 }
 
-void ABasePlayer::SetOwner(AActor* NewOwner)
+void ABasePlayer::OnRep_Owner()
 {
-	Super::SetOwner(NewOwner);
-	mPlayerController = Cast<APlayerController>(NewOwner);
+	Super::OnRep_Owner();
+	mPlayerController = Cast<APlayerController>(Owner);
 }
 
 void ABasePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -137,9 +138,17 @@ void ABasePlayer::HealPlayer_Implementation(float HealAmount)
 	Server_UpdateHUD();
 }
 
-void ABasePlayer::Server_Death_Implementation()
+void ABasePlayer::AddKill_Implementation()
 {
-	Super::Server_Death_Implementation();
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_AddKill(mPlayerController);
+	}
+}
+
+void ABasePlayer::Server_Death_Implementation(AActor* Player)
+{
+	Super::Server_Death_Implementation(Player);
 	Server_RespawnPlayer();
 }
 

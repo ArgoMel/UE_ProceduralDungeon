@@ -28,6 +28,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Default")
 	TObjectPtr<UInputAction> mAction4;
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Default")
+	TObjectPtr<UInputAction> mPlayerStats;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Default")
 	int32 mDefaultMapPriority;
 };
 

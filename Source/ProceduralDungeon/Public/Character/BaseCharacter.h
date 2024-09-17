@@ -58,14 +58,22 @@ public:
 	virtual void Multi_SpawnParticle_Implementation(UParticleSystem* EmitterTemplate, FVector Location, FRotator Rotation = FRotator::ZeroRotator, FVector Scale = FVector(1.f));
 
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
-	void Server_Death();
-	virtual void Server_Death_Implementation();
+	void Server_Death(AActor* Player=nullptr);
+	virtual void Server_Death_Implementation(AActor* Player = nullptr);
 	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
 	void Client_Death();
 	virtual void Client_Death_Implementation();
 	UFUNCTION(BlueprintCallable)
 	virtual void Death();
 
+	float GetCurHP() const
+	{
+		return mCurHealth;
+	}
+	float GetMaxHP() const
+	{
+		return mMaxHealth;
+	}
 	bool GetIsDead() const
 	{
 		return bIsDead;

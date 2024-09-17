@@ -81,7 +81,7 @@ void AAISpawner::SpawnEnemyTimer_Implementation()
 		++mSpawnedEnemies;
 		++mCurrentSpawned;
 		enemy->OnEnemyDies.AddDynamic(this,&ThisClass::HandleSpawnedDeath);
-		if (mCurrentSpawned >= mTotalEnemiesToSpawn)
+		if (mSpawnedEnemies >= mTotalEnemiesToSpawn)
 		{
 			StopSpawning();
 			SpawnEnemies();
@@ -105,7 +105,7 @@ void AAISpawner::HandleSpawnedDeath_Implementation(ABaseEnemy* DeadEnemy)
 
 void AAISpawner::SpawnEnemies_Implementation()
 {
-	if(mCurrentSpawned>=mTotalEnemiesToSpawn)
+	if(mSpawnedEnemies >=mTotalEnemiesToSpawn)
 	{
 		if(bDestroyAfterFinalSpawn)
 		{
@@ -115,7 +115,7 @@ void AAISpawner::SpawnEnemies_Implementation()
 	}
 	if (!mSpawnEnemyTimer.IsValid())
 	{
-		GetWorld()->GetTimerManager().SetTimer(mSpawnEnemyTimer, this, &ThisClass::SpawnEnemyTimer_Implementation, mSpawnTime, true);
+		GetWorld()->GetTimerManager().SetTimer(mSpawnEnemyTimer, this, &ThisClass::SpawnEnemyTimer, mSpawnTime, true);
 	}
 }
 

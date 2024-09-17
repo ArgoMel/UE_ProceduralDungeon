@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "Engine/DamageEvents.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -137,7 +138,7 @@ void APlayer_Swordsman::UseAction1_Implementation()
 			{
 				continue;
 			}
-			UGameplayStatics::ApplyDamage(result, mAction1Damage,nullptr,this,nullptr);
+			result->TakeDamage(mAction1Damage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), this);
 		}
 	}
 }
@@ -160,7 +161,7 @@ void APlayer_Swordsman::UseAction4_Implementation()
 			{
 				continue;
 			}
-			UGameplayStatics::ApplyDamage(result, mAction4Damage, nullptr, this, nullptr);
+			result->TakeDamage(mAction4Damage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), this);
 		}
 	}
 }
@@ -283,8 +284,7 @@ void APlayer_Swordsman::OnBlinkBoxBeginOverlap(UPrimitiveComponent* OverlappedCo
 	}
 	if (HasAuthority())
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, mAction2Damage, nullptr, this, nullptr);
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetFName().ToString());
+		OtherActor->TakeDamage(mAction2Damage, FDamageEvent(), UGameplayStatics::GetPlayerController(GetWorld(), 0), this);
 	}
 }
 

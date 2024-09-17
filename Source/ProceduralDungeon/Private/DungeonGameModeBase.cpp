@@ -46,3 +46,18 @@ void ADungeonGameModeBase::GetSelectedClass_Implementation(TSubclassOf<ABasePlay
 		IINT_PlayerController::Execute_PlayerFirstSpawn(PlayerController, SelectedClass, randLoc);
 	}
 }
+
+void ADungeonGameModeBase::GetPlayerStats_Implementation(TArray<FPlayerStats>& PlayerStats)
+{
+	mPlayerStats.Empty();
+	for (auto& player : mConnectedPlayers)
+	{
+		if (!player->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+		{
+			continue;
+		}
+		FPlayerStats playerStats = IINT_PlayerController::Execute_GetPlayerStats(player);
+		mPlayerStats.Add(playerStats);
+	}
+	PlayerStats= mPlayerStats;
+}

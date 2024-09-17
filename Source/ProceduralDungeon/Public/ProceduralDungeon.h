@@ -4,12 +4,14 @@
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
 #include "InputActionValue.h"
+#include "ProceduralDungeon.generated.h"
 
 #define PROFILENAME_RAGDOLL TEXT("ragdoll")
 #define PROFILENAME_PAWN TEXT("Pawn")
 #define PROFILENAME_BLINK TEXT("Blink")
 #define PROFILENAME_ENEMYATTACK TEXT("EnemyAttack")
 #define PROFILENAME_PLAYERATTACK TEXT("PlayerAttack")
+#define PROFILENAME_REACTONLYPAWN TEXT("ReactOnlyPawn")
 #define PROFILENAME_NOCOLLISION TEXT("NoCollision")
 
 #define TAG_PLAYER TEXT("Player")
@@ -17,6 +19,40 @@
 
 #define MAP_FIRSTLEVEL TEXT("Test")
 #define MAP_MAINMENU TEXT("MainMenu")
+
+UENUM(BlueprintType)
+enum class EPickupType : uint8
+{
+	Gold,
+	HealthPotion,
+	ManaPotion,
+	Max UMETA(Hidden)
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerStats
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString PlayerName;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 KillCount;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 Gold;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float HealthPCT;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float ManaPCT;
+
+	FPlayerStats()
+	{
+		KillCount = 0;
+		Gold = 0;
+		HealthPCT = 0.f;
+		ManaPCT = 0.f;
+	}
+};
 
 #pragma region ValidMecro
 #define NULLCHECK(POINTER)\
