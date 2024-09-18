@@ -17,7 +17,7 @@ public:
 	ABasePlayer();
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	/*º≠πˆø°º±∏∏ Ω««‡*/
+	/*ÏÑúÎ≤ÑÏóêÏÑ†Îßå Ïã§Ìñâ*/
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_Owner() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -28,6 +28,9 @@ public:
 	void InitializeHUD_Implementation();
 	void HealPlayer_Implementation(float HealAmount);
 	void AddKill_Implementation();
+	void UpdateUpgradeScreen_Implementation(bool ShowScreen);
+	void GetAbilityUpgrades_Implementation(TArray<FAbilityUpgrade>& AbailableUpgrade);
+	void UpgradeAbility_Implementation(int32 Action, int32 ActionSub);
 public:
 	virtual void Server_Death_Implementation(AActor* Player = nullptr) override;
 	virtual void Death() override;
@@ -65,6 +68,8 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TObjectPtr<APlayerController> mPlayerController;
+	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
+	TArray<FAbilityUpgrade> mAbailableUpgrade;
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	FTimerHandle mManaRegenTimer;
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
@@ -73,6 +78,9 @@ protected:
 protected:
 	UFUNCTION()
 	void RegenManaTimer();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void GenerateAbilityUpgradeList();
 
 public:
 	UFUNCTION(BlueprintPure)

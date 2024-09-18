@@ -56,6 +56,7 @@ void ABasePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ThisClass, mAction3Damage);
 	DOREPLIFETIME(ThisClass, mAction4Damage);
 	DOREPLIFETIME(ThisClass, mManaRegenOverTime);
+	DOREPLIFETIME(ThisClass, mAbailableUpgrade);
 	DOREPLIFETIME(ThisClass, bCurrentlyAttacking);
 }
 
@@ -147,6 +148,24 @@ void ABasePlayer::AddKill_Implementation()
 	}
 }
 
+void ABasePlayer::UpdateUpgradeScreen_Implementation(bool ShowScreen)
+{
+	if (mPlayerController->GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_UpdateUpgradeScreen(mPlayerController, ShowScreen);
+	}
+}
+
+void ABasePlayer::GetAbilityUpgrades_Implementation(TArray<FAbilityUpgrade>& AbailableUpgrade)
+{
+	GenerateAbilityUpgradeList();
+	AbailableUpgrade = mAbailableUpgrade;
+}
+
+void ABasePlayer::UpgradeAbility_Implementation(int32 Action, int32 ActionSub)
+{
+}
+
 void ABasePlayer::Server_Death_Implementation(AActor* Player)
 {
 	Super::Server_Death_Implementation(Player);
@@ -170,6 +189,16 @@ void ABasePlayer::RegenManaTimer()
 	{
 		Server_RegenManaTimerStop();
 	}
+}
+
+void ABasePlayer::GenerateAbilityUpgradeList()
+{
+	mAbailableUpgrade.Empty();
+	FAbilityUpgrade ability1;
+	ability1.ActionName = FText::FromString(TEXT("생성 필요"));
+	ability1.ActionDesc = FText::FromString(TEXT("게을러서 이렇게함"));
+	ability1.GoldCost = 99999;
+	mAbailableUpgrade.Add(ability1);
 }
 
 bool ABasePlayer::CanUseMana(float ManaCost, bool ReduceInstant)

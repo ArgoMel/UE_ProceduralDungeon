@@ -2,6 +2,7 @@
 
 #include "Widget/GameStatsWidget.h"
 #include "Widget/PlayerStatsWidget.h"
+#include "ProceduralDungeon.h"
 #include "Components/ScrollBox.h"
 
 UGameStatsWidget::UGameStatsWidget(const FObjectInitializer& ObjectInitializer)
@@ -21,7 +22,7 @@ void UGameStatsWidget::AddChild(int32 Index, FPlayerStats* PlayerStat)
 	UPlayerStatsWidget* playerStatWidget = nullptr;
 	if (Index >= childCount)
 	{
-		playerStatWidget = CreateWidget<UPlayerStatsWidget>(this, mPlayerStatsClass);
+		playerStatWidget = CreateWidget<UPlayerStatsWidget>(GetOwningPlayer(), mPlayerStatsClass);
 		playerStatWidget->SetPlayerStat(PlayerStat);
 		PlayerStatSB->AddChild(playerStatWidget);
 	}

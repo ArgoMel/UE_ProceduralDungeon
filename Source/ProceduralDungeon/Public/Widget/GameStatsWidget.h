@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "ProceduralDungeon.h"
+#include <DungeonStruct.h>
 #include "Blueprint/UserWidget.h"
 #include "GameStatsWidget.generated.h"
 

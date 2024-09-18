@@ -38,4 +38,10 @@ public:
 	void HealPlayer(float HealAmount);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void AddKill();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void UpdateUpgradeScreen(bool ShowScreen);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void GetAbilityUpgrades(TArray<FAbilityUpgrade>& AbailableUpgrade);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void UpgradeAbility(int32 Action,int32 ActionSub);
 };

@@ -7,6 +7,7 @@
 
 class UHUDWidget;
 class UGameStatsWidget;
+class UUpgradeScreenWidget;
 class UDungeonGameIAs;
 
 UCLASS()
@@ -32,6 +33,8 @@ public:
 	void AddKill_Implementation();
 	APC_DungeonGame* GetDungeonPCRef_Implementation();
 	FPlayerStats GetPlayerStats_Implementation();
+	void UpdateUpgradeScreen_Implementation(bool Show);
+	void UpdateAbility_Implementation(int32 Action, int32 SubAction, int32 GoldCost);
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Variable")
@@ -58,6 +61,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Widget")
 	TObjectPtr<UGameStatsWidget> mGameStats;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Widget")
+	TSubclassOf<UUserWidget> mUpgradeScreenClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Widget")
+	TObjectPtr<UUpgradeScreenWidget> mUpgradeScreen;
+
 protected:
 	UFUNCTION()
 	virtual void MoveTriggered(const FInputActionValue& Value);
@@ -70,6 +78,10 @@ public:
 	virtual void Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlayer> SelectedClass);
 
 	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
+	void Server_TryUpdateAbility(int32 Action, int32 SubAction, int32 GoldCost);
+	virtual void Server_TryUpdateAbility_Implementation(int32 Action, int32 SubAction, int32 GoldCost);
+
+	UFUNCTION(BlueprintCallable, Server, Reliable, Category = "Server")
 	void Server_GetStats();
 	virtual void Server_GetStats_Implementation();
 	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
@@ -79,6 +91,9 @@ public:
 	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
 	void Client_UpdateHUD(float HP, float MP,int32 Gold);
 	virtual void Client_UpdateHUD_Implementation(float HP, float MP, int32 Gold);
+	UFUNCTION(BlueprintCallable, Client, Reliable, Category = "Client")
+	void Client_UpdateUpgradeScreen(bool Show, const TArray<FAbilityUpgrade>& AbilityUpgrade);
+	virtual void Client_UpdateUpgradeScreen_Implementation(bool Show, const TArray<FAbilityUpgrade>& AbilityUpgrade);
 
 #pragma region EnhancedInput
 protected:

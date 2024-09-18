@@ -18,10 +18,13 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+protected:
+	virtual void GenerateAbilityUpgradeList() override;
 public:
 	void UseAction1_Implementation();
 	void UseAction4_Implementation();
 	APlayer_Swordsman* GetPlayerSwordsmanRef_Implementation();
+	void UpgradeAbility_Implementation(int32 Action, int32 ActionSub);
 
 private:
 	FTimeline mBlinkTL;

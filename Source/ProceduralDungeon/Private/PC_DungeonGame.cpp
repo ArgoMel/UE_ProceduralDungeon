@@ -4,6 +4,7 @@
 #include "Character/BasePlayer.h"
 #include "Widget/HUDWidget.h"
 #include "Widget/GameStatsWidget.h"
+#include "Widget/UpgradeScreenWidget.h"
 #include "Interface/INT_PlayerCharacter.h"
 #include "Interface/INT_GameMode.h"
 #include "Input/DungeonGameIAs.h"
@@ -24,6 +25,7 @@ APC_DungeonGame::APC_DungeonGame()
 	//GetClassAsset(mCharacterSelectClass, UUserWidget,"/Game/_Main/Widget/WBP_CharacterSelect.WBP_CharacterSelect");
 	GetClassAsset(mHUDClass, UUserWidget,"/Game/_Main/Widget/WBP_HUD.WBP_HUD_C");
 	GetClassAsset(mGameStatsClass, UUserWidget,"/Game/_Main/Widget/WBP_GameStats.WBP_GameStats_C");
+	GetClassAsset(mUpgradeScreenClass, UUserWidget,"/Game/_Main/Widget/WBP_UpgradeScreen.WBP_UpgradeScreen_C");
 
 	GetObjectAsset(mDungeonGameIAs, UDungeonGameIAs,"/Game/_Main/Inputs/DA_DungoenGameIAs.DA_DungoenGameIAs");
 }
@@ -167,6 +169,22 @@ FPlayerStats APC_DungeonGame::GetPlayerStats_Implementation()
 	return playerStats;
 }
 
+void APC_DungeonGame::UpdateUpgradeScreen_Implementation(bool Show)
+{
+	TArray<FAbilityUpgrade> upgrades;
+	if (Show&&
+		mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		IINT_PlayerCharacter::Execute_GetAbilityUpgrades(mPlayerPawn, upgrades);
+	}
+	Client_UpdateUpgradeScreen(Show, upgrades);
+}
+
+void APC_DungeonGame::UpdateAbility_Implementation(int32 Action, int32 SubAction, int32 GoldCost)
+{
+	Server_TryUpdateAbility(Action, SubAction, GoldCost);
+}
+
 void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)
 {
 	if (!IsValid(mPlayerPawn)||!bCanMove)
@@ -192,6 +210,24 @@ void APC_DungeonGame::Server_SpawnCharacter_Implementation(TSubclassOf<ABasePlay
 	if (gameMode->GetClass()->ImplementsInterface(UINT_GameMode::StaticClass()))
 	{
 		IINT_GameMode::Execute_GetSelectedClass(gameMode, SelectedClass,this);
+	}
+}
+
+void APC_DungeonGame::Server_TryUpdateAbility_Implementation(int32 Action, int32 SubAction, int32 GoldCost)
+{
+	if(GoldCost>mGold)
+	{
+		return;
+	}
+	mGold -= GoldCost;
+	if (mPlayerPawn->GetClass()->ImplementsInterface(UINT_PlayerCharacter::StaticClass()))
+	{
+		IINT_PlayerCharacter::Execute_InitializeHUD(mPlayerPawn);
+		IINT_PlayerCharacter::Execute_UpgradeAbility(mPlayerPawn, Action, SubAction);
+	}
+	if (GetClass()->ImplementsInterface(UINT_PlayerController::StaticClass()))
+	{
+		IINT_PlayerController::Execute_UpdateUpgradeScreen(this, true);
 	}
 }
 
@@ -230,6 +266,29 @@ void APC_DungeonGame::Client_UpdateHUD_Implementation(float HP, float MP, int32 
 		mHUD->AddToViewport();
 	}
 	mHUD->UpdateHUD(HP, MP, Gold);
+}
+
+void APC_DungeonGame::Client_UpdateUpgradeScreen_Implementation(bool Show, const TArray<FAbilityUpgrade>& AbilityUpgrade)
+{
+	if(Show)
+	{
+		if (!IsValid(mUpgradeScreen))
+		{
+			mUpgradeScreen = CreateWidget<UUpgradeScreenWidget>(this, mUpgradeScreenClass);
+			mUpgradeScreen->Clear();
+		}
+		int32 index = 0;
+		for (FAbilityUpgrade upgrade : AbilityUpgrade)
+		{
+			mUpgradeScreen->AddChild(index, &upgrade,mGold);
+			++index;
+		}
+		mUpgradeScreen->AddToViewport();
+	}
+	else
+	{
+		mUpgradeScreen->RemoveFromParent();
+	}
 }
 
 void APC_DungeonGame::AddInputMapping(const UInputMappingContext* InputMapping, const int32 MappingPriority) const

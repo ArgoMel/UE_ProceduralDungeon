@@ -5,7 +5,7 @@
 
 FString UAN_AttackComplete::GetNotifyName_Implementation() const
 {
-    return TEXT("Attack Complete");
+    return TEXT("공격 완료");
 }
 
 void UAN_AttackComplete::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

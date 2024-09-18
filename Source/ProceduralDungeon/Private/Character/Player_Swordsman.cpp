@@ -122,6 +122,50 @@ float APlayer_Swordsman::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
+void APlayer_Swordsman::GenerateAbilityUpgradeList()
+{
+	mAbailableUpgrade.Empty();
+	FAbilityUpgrade ability1;
+	ability1.Action = 1;
+	ability1.ActionSub = 0;
+	ability1.ActionName = FText::FromString(TEXT("소드 스윙"));
+	ability1.ActionDesc = FText::FromString(TEXT("데미지 10 증가"));
+	ability1.GoldCost = 25;
+	mAbailableUpgrade.Add(ability1);
+
+	FAbilityUpgrade ability2_0;
+	ability2_0.Action = 2;
+	ability2_0.ActionSub = 0;
+	ability2_0.ActionName = FText::FromString(TEXT("순간이동"));
+	ability2_0.ActionDesc = FText::FromString(TEXT("마나 소모량 감소"));
+	ability2_0.GoldCost = 100;
+	mAbailableUpgrade.Add(ability2_0);
+
+	FAbilityUpgrade ability2_1;
+	ability2_1.Action = 2;
+	ability2_1.ActionSub = 1;
+	ability2_1.ActionName = FText::FromString(TEXT("순간이동"));
+	ability2_1.ActionDesc = FText::FromString(TEXT("데미지 5 증가"));
+	ability2_1.GoldCost = 50;
+	mAbailableUpgrade.Add(ability2_1);
+
+	FAbilityUpgrade ability3_0;
+	ability3_0.Action =4;
+	ability3_0.ActionSub = 0;
+	ability3_0.ActionName = FText::FromString(TEXT("그라운드 스매쉬"));
+	ability3_0.ActionDesc = FText::FromString(TEXT("마나 소모량 감소"));
+	ability3_0.GoldCost = 200;
+	mAbailableUpgrade.Add(ability3_0);
+
+	FAbilityUpgrade ability3_1;
+	ability3_1.Action = 4;
+	ability3_1.ActionSub = 1;
+	ability3_1.ActionName = FText::FromString(TEXT("그라운드 스매쉬"));
+	ability3_1.ActionDesc = FText::FromString(TEXT("데미지 20 증가"));
+	ability3_1.GoldCost = 250;
+	mAbailableUpgrade.Add(ability3_1);
+}
+
 void APlayer_Swordsman::UseAction1_Implementation()
 {
 	if(HasAuthority())
@@ -169,6 +213,40 @@ void APlayer_Swordsman::UseAction4_Implementation()
 APlayer_Swordsman* APlayer_Swordsman::GetPlayerSwordsmanRef_Implementation()
 {
 	return this;
+}
+
+void APlayer_Swordsman::UpgradeAbility_Implementation(int32 Action, int32 ActionSub)
+{
+	switch (Action)
+	{
+	case 1:
+		mAction1Damage += 10.f;
+		break;
+	case 2:
+		switch (ActionSub)
+		{
+		case 0:
+			mAction2ManaCost=FMath::Clamp(mAction2ManaCost-2.5f,0.f,TNumericLimits<float>::Max());
+			break;
+		case 1:
+			mAction2Damage += 5.f;
+			break;
+		}
+		break;
+	case 3:
+		break;
+	case 4:
+		switch (ActionSub)
+		{
+		case 0:
+			mAction4ManaCost = FMath::Clamp(mAction4ManaCost - 2.5f, 0.f, TNumericLimits<float>::Max());
+			break;
+		case 1:
+			mAction4Damage += 20.f;
+			break;
+		}
+		break;
+	}
 }
 
 void APlayer_Swordsman::Server_Action1_Implementation()

@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
 #include "InputActionValue.h"
-#include "ProceduralDungeon.generated.h"
 
 #define PROFILENAME_RAGDOLL TEXT("ragdoll")
 #define PROFILENAME_PAWN TEXT("Pawn")
@@ -27,31 +26,6 @@ enum class EPickupType : uint8
 	HealthPotion,
 	ManaPotion,
 	Max UMETA(Hidden)
-};
-
-USTRUCT(BlueprintType)
-struct FPlayerStats
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString PlayerName;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 KillCount;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 Gold;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float HealthPCT;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float ManaPCT;
-
-	FPlayerStats()
-	{
-		KillCount = 0;
-		Gold = 0;
-		HealthPCT = 0.f;
-		ManaPCT = 0.f;
-	}
 };
 
 #pragma region ValidMecro
