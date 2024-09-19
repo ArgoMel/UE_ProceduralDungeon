@@ -12,7 +12,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerState.h"
 #include <Kismet/KismetMathLibrary.h>
-#include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
 APC_DungeonGame::APC_DungeonGame()
@@ -57,22 +56,7 @@ void APC_DungeonGame::SetPawn(APawn* InPawn)
 void APC_DungeonGame::BeginPlay()
 {
 	Super::BeginPlay();
-	if(HasAuthority()&&
-		!UKismetSystemLibrary::IsServer(GetWorld()))
-	{
-		return;
-	}
-	mCharacterSelect = CreateWidget<UUserWidget>(this, mCharacterSelectClass);
-	if(!mCharacterSelect)
-	{
-		return;
-	}
-	mCharacterSelect->AddToViewport();
-	FInputModeGameAndUI inputmode;
-	inputmode.SetWidgetToFocus(mCharacterSelect->GetCachedWidget());
-	inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	inputmode.SetHideCursorDuringCapture(false);
-	SetInputMode(inputmode);
+	CreateMainMenu();
 	SetShowMouseCursor(true);
 }
 
@@ -183,6 +167,20 @@ void APC_DungeonGame::UpdateUpgradeScreen_Implementation(bool Show)
 void APC_DungeonGame::UpdateAbility_Implementation(int32 Action, int32 SubAction, int32 GoldCost)
 {
 	Server_TryUpdateAbility(Action, SubAction, GoldCost);
+}
+
+void APC_DungeonGame::CreateMainMenu_Implementation()
+{
+	mCharacterSelect = CreateWidget<UUserWidget>(this, mCharacterSelectClass);
+	if (mCharacterSelect)
+	{
+		mCharacterSelect->AddToViewport();
+		FInputModeGameAndUI inputmode;
+		inputmode.SetWidgetToFocus(mCharacterSelect->GetCachedWidget());
+		inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		inputmode.SetHideCursorDuringCapture(false);
+		SetInputMode(inputmode);
+	}
 }
 
 void APC_DungeonGame::MoveTriggered(const FInputActionValue& Value)

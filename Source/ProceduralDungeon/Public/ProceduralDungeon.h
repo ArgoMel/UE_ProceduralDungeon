@@ -16,7 +16,7 @@
 #define TAG_PLAYER TEXT("Player")
 #define TAG_ENEMY TEXT("Enemy")
 
-#define MAP_FIRSTLEVEL TEXT("Test")
+#define MAP_FIRSTLEVEL TEXT("Level_01")
 #define MAP_MAINMENU TEXT("MainMenu")
 
 UENUM(BlueprintType)
@@ -38,23 +38,23 @@ if (!POINTER)\
 #define VALIDCHECK(POINTER)\
 if (!IsValid(POINTER))\
 {\
-	UE_LOG(LogTemp, Warning, TEXT("%s À¯È¿ÇÏÁö ¾ÊÀ½"), *POINTER->GetFName().ToString());\
+	UE_LOG(LogTemp, Warning, TEXT("%s ìœ íš¨í•˜ì§€ ì•ŠìŒ"), *POINTER->GetFName().ToString());\
 	return;\
 }
 
 #define VALIDCHECK_RETURNVALUE(POINTER,VALUE)\
 if (!IsValid(POINTER))\
 {\
-	UE_LOG(LogTemp, Warning, TEXT("%s À¯È¿ÇÏÁö ¾ÊÀ½"), *POINTER->GetFName().ToString());\
+	UE_LOG(LogTemp, Warning, TEXT("%s ìœ íš¨í•˜ì§€ ì•ŠìŒ"), *POINTER->GetFName().ToString());\
 	return VALUE;\
 }
 #pragma endregion
 
 #pragma region LoadAsset
-/*    Object AssetÀ» ¹Ş½À´Ï´Ù.
-*    RETURN_POINTER : ¹ŞÀ» Æ÷ÀÎÅÍ
-*    CLASS_TYPE : ¹ŞÀ» ¿ÀºêÁ§Æ®ÀÇ Å¬·¡½º
-*    PATH : °æ·Î (TEXT¸¦ ºÙÀÌÁö ¾Ê½À´Ï´Ù.)*/
+/*    Object Assetì„ ë°›ìŠµë‹ˆë‹¤.
+*    RETURN_POINTER : ë°›ì„ í¬ì¸í„°
+*    CLASS_TYPE : ë°›ì„ ì˜¤ë¸Œì íŠ¸ì˜ í´ë˜ìŠ¤
+*    PATH : ê²½ë¡œ (TEXTë¥¼ ë¶™ì´ì§€ ì•ŠìŠµë‹ˆë‹¤.)*/
 #define GetObjectAsset(RETURN_POINTER, CLASS_TYPE, PATH)\
 static ConstructorHelpers::FObjectFinder<CLASS_TYPE> __##RETURN_POINTER(TEXT(PATH));\
 if (__##RETURN_POINTER.Succeeded()) \
@@ -77,10 +77,10 @@ else \
 {\
 	UE_LOG(LogTemp,Warning,TEXT("Failed AddObjectAsset : %s"),TEXT(PATH));\
 }
-/*    Class AssetÀ» ¹Ş½À´Ï´Ù.
-*    RETURN_POINTER : ¹ŞÀ» Æ÷ÀÎÅÍ
-*    CLASS_TYPE : ¹ŞÀ» Å¬·¡½º Å¸ÀÔ
-*    PATH : °æ·Î (TEXT¸¦ ºÙÀÌÁö ¾Ê½À´Ï´Ù.)*/
+/*    Class Assetì„ ë°›ìŠµë‹ˆë‹¤.
+*    RETURN_POINTER : ë°›ì„ í¬ì¸í„°
+*    CLASS_TYPE : ë°›ì„ í´ë˜ìŠ¤ íƒ€ì…
+*    PATH : ê²½ë¡œ (TEXTë¥¼ ë¶™ì´ì§€ ì•ŠìŠµë‹ˆë‹¤.)*/
 #define GetClassAsset(RETURN_POINTER, CLASS_TYPE, PATH)\
 static ConstructorHelpers::FClassFinder<CLASS_TYPE> __##RETURN_POINTER(TEXT(PATH));\
 if (__##RETURN_POINTER.Succeeded()) \

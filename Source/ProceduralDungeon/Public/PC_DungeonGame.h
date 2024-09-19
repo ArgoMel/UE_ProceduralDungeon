@@ -66,6 +66,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Widget")
 	TObjectPtr<UUpgradeScreenWidget> mUpgradeScreen;
 
+private:
+	UFUNCTION(Client, Reliable, Category = "Client")
+	void CreateMainMenu();
+	virtual void CreateMainMenu_Implementation();
+
 protected:
 	UFUNCTION()
 	virtual void MoveTriggered(const FInputActionValue& Value);

@@ -14,7 +14,16 @@ void APC_MainMenu::BeginPlay()
 	Super::BeginPlay();
 	if(HasAuthority())
 	{
-	
+		if (GetNetMode() == NM_Standalone)
+		{
+			mMainMenu = CreateWidget<UUserWidget>(this, mMainMenuClass);
+			mMainMenu->AddToViewport();
+			FInputModeGameAndUI inputmode;
+			inputmode.SetWidgetToFocus(mMainMenu->GetCachedWidget());
+			inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
+			inputmode.SetHideCursorDuringCapture(false);
+			SetInputMode(inputmode);
+		}
 	}
 	else
 	{
@@ -25,6 +34,7 @@ void APC_MainMenu::BeginPlay()
 		inputmode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
 		inputmode.SetHideCursorDuringCapture(false);
 		SetInputMode(inputmode);
-		SetShowMouseCursor(true);
+
 	}
+	SetShowMouseCursor(true);
 }
