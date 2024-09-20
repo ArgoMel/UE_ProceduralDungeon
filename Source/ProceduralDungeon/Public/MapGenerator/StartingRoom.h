@@ -29,4 +29,5 @@ protected:
 
 public:
 	void GetExitArrows(TArray<USceneComponent*>& ExitList);
+	void GetColliders(TArray<UShapeComponent*>& ColliderList);
 };

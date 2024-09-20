@@ -2,6 +2,7 @@
 
 #include "MapGenerator/StartingRoom.h"
 #include "Components/ArrowComponent.h"
+#include "Components/ShapeComponent.h"
 
 AStartingRoom::AStartingRoom()
 {
@@ -37,5 +38,19 @@ void AStartingRoom::Tick(float DeltaTime)
 void AStartingRoom::GetExitArrows(TArray<USceneComponent*>& ExitList)
 {
 	mRoomExitList->GetChildrenComponents(false, ExitList);
+}
+
+void AStartingRoom::GetColliders(TArray<UShapeComponent*>& ColliderList)
+{
+	TArray<USceneComponent*> components;
+	mOverlapBoxList->GetChildrenComponents(false, components);
+	for(auto& component: components)
+	{
+		UShapeComponent* shapeComp = Cast<UShapeComponent>(component);
+		if(shapeComp)
+		{
+			ColliderList.Add(shapeComp);
+		}
+	}
 }
 

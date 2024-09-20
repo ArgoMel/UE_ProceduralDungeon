@@ -38,14 +38,14 @@ if (!POINTER)\
 #define VALIDCHECK(POINTER)\
 if (!IsValid(POINTER))\
 {\
-	UE_LOG(LogTemp, Warning, TEXT("%s 유효하지 않음"), *POINTER->GetFName().ToString());\
+	UE_LOG(LogTemp, Warning, TEXT("%hs 유효하지 않음"), #POINTER);\
 	return;\
 }
 
 #define VALIDCHECK_RETURNVALUE(POINTER,VALUE)\
 if (!IsValid(POINTER))\
 {\
-	UE_LOG(LogTemp, Warning, TEXT("%s 유효하지 않음"), *POINTER->GetFName().ToString());\
+	UE_LOG(LogTemp, Warning, TEXT("%hs 유효하지 않음"), #POINTER);\
 	return VALUE;\
 }
 #pragma endregion
@@ -63,7 +63,7 @@ if (__##RETURN_POINTER.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed GetObjectAsset : %s"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed GetObjectAsset : %hs"),#RETURN_POINTER);\
 	RETURN_POINTER = nullptr;\
 }
 
@@ -75,7 +75,7 @@ if (RETURN_POINTER##INDEX.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed AddObjectAsset : %s"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed AddObjectAsset : %hs"),#RETURN_POINTER);\
 }
 /*    Class Asset을 받습니다.
 *    RETURN_POINTER : 받을 포인터
@@ -89,7 +89,7 @@ if (__##RETURN_POINTER.Succeeded()) \
 }\
 else \
 {\
-	UE_LOG(LogTemp,Warning,TEXT("Failed GetClassAsset : %s"),TEXT(PATH));\
+	UE_LOG(LogTemp,Warning,TEXT("Failed GetClassAsset : %hs"),#RETURN_POINTER);\
 	RETURN_POINTER = nullptr;\
 }
 #pragma endregion

@@ -20,21 +20,31 @@ protected:
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Variable")
 	TArray<TSubclassOf<AStartingRoom>> mStartRoomClasses;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Variable")
 	TArray<TSubclassOf<AStartingRoom>> mRoomList;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Variable")
+	TMap<TSubclassOf<AStartingRoom>,int32> mRequiredRooms;
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TArray<AStartingRoom*> mAllRooms;
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	TArray<USceneComponent*> mExitPointList;
+	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	TArray<UPrimitiveComponent*> mOverlappingRoomList;
+	UPROPERTY(BlueprintReadWrite, Category = "Variable")
+	TObjectPtr<AStartingRoom> mLatestRoom;
 	UPROPERTY(BlueprintReadWrite, Category = "Variable")
 	FRandomStream mRandomStream;
 	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category = "Variable")
 	int32 mSeed;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Variable")
 	int32 mRoomAmount;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Variable")
+	int32 mMaxRooms;
 
 public:
+	UFUNCTION(BlueprintPure)
+	bool Overlaps();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,CallInEditor)
 	void SpawnStartRoom();
 	void SpawnStartRoom_Implementation();
@@ -42,4 +52,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SpawnNextRoom();
 	void SpawnNextRoom_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void CheckForOverlappingRoom();
+	void CheckForOverlappingRoom_Implementation();
 };
